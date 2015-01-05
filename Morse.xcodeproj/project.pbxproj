@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F162FAA1A5B0E4600945D4C /* cwprotocol.c in Sources */ = {isa = PBXBuildFile; fileRef = 7F162FA91A5B0E4600945D4C /* cwprotocol.c */; };
 		7F1E35321A5AE782008D519D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35311A5AE782008D519D /* main.m */; };
 		7F1E35351A5AE782008D519D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35341A5AE782008D519D /* AppDelegate.m */; };
 		7F1E35381A5AE782008D519D /* Morse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35361A5AE782008D519D /* Morse.xcdatamodeld */; };
@@ -30,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7F162FA81A5B0E2900945D4C /* cwprotocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cwprotocol.h; sourceTree = "<group>"; };
+		7F162FA91A5B0E4600945D4C /* cwprotocol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cwprotocol.c; sourceTree = "<group>"; };
 		7F1E352C1A5AE782008D519D /* Morse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Morse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F1E35301A5AE782008D519D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7F1E35311A5AE782008D519D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -89,8 +92,10 @@
 			children = (
 				7F1E35331A5AE782008D519D /* AppDelegate.h */,
 				7F1E35341A5AE782008D519D /* AppDelegate.m */,
+				7F162FA81A5B0E2900945D4C /* cwprotocol.h */,
 				7F1E35391A5AE782008D519D /* ViewController.h */,
 				7F1E353A1A5AE782008D519D /* ViewController.m */,
+				7F162FA91A5B0E4600945D4C /* cwprotocol.c */,
 				7F1E353C1A5AE782008D519D /* Main.storyboard */,
 				7F1E353F1A5AE782008D519D /* Images.xcassets */,
 				7F1E35411A5AE782008D519D /* LaunchScreen.xib */,
@@ -233,6 +238,7 @@
 				7F1E35351A5AE782008D519D /* AppDelegate.m in Sources */,
 				7F1E35381A5AE782008D519D /* Morse.xcdatamodeld in Sources */,
 				7F1E353B1A5AE782008D519D /* ViewController.m in Sources */,
+				7F162FAA1A5B0E4600945D4C /* cwprotocol.c in Sources */,
 				7F1E35321A5AE782008D519D /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -426,6 +432,7 @@
 				7F1E35541A5AE782008D519D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7F1E35551A5AE782008D519D /* Build configuration list for PBXNativeTarget "MorseTests" */ = {
 			isa = XCConfigurationList;
@@ -434,6 +441,7 @@
 				7F1E35571A5AE782008D519D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

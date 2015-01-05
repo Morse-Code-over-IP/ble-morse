@@ -8,6 +8,13 @@
 
 #import "ViewController.h"
 #import <AudioToolbox/AudioToolbox.h>
+#include "cwprotocol.h"
+
+
+struct command_packet_format connect_packet = {CON, DEFAULT_CHANNEL};
+struct command_packet_format disconnect_packet = {DIS, 0};
+struct data_packet_format id_packet;
+struct data_packet_format rx_data_packet;
 
 OSStatus RenderTone(
                     void *inRefCon,
