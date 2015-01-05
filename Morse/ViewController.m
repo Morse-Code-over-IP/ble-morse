@@ -8,6 +8,9 @@
 
 #import "ViewController.h"
 #import <AudioToolbox/AudioToolbox.h>
+#import <netdb.h>
+#import <netinet/in.h>
+#import <netinet6/in6.h>
 #include "cwprotocol.h"
 
 
@@ -74,15 +77,30 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 
 @synthesize img;
 @synthesize img2;
-/*does not exist
- @synthesize frequencySlider;
-@synthesize playButton;
-@synthesize frequencyLabel;*/
 
-- (IBAction)sliderChanged:(UISlider *)slider
+- (void)connectMorse
 {
-    frequency = slider.value;
-    frequencyLabel.text = [NSString stringWithFormat:@"%4.1f Hz", frequency];
+    char hostname[64] = "mtc-kob.dyndns.org";
+    char id[SIZE_ID] = "Test iOS";
+    int channel = 33;
+    char port[16] = "7839";
+    prepare_id (&id_packet, id);
+    connect_packet.channel = channel;
+    
+    struct addrinfo hints, *servinfo, *p;
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC; /* ipv4 or ipv6 */
+    hints.ai_socktype = SOCK_DGRAM;
+    int rv;
+    if ((rv = getaddrinfo(hostname, port, &hints, &servinfo)) != 0) {
+       //error fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+       //error return 1;
+    }
+
+}
+
+- (void)disconnectMorse
+{
 }
 
 - (void)createToneUnit
@@ -190,6 +208,7 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
     AudioSessionSetActive(true);
     
 
+    [self connectMorse];
     frequency = 800;
     [self beep];
    
@@ -204,6 +223,8 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 
 - (void)stop
 {
+    [self disconnectMorse];
+    
     if (toneUnit)
     {
         // Stop sound

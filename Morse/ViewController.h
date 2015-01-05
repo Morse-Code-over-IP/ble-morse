@@ -28,5 +28,8 @@
 @property (weak, nonatomic) IBOutlet UIImageView *img2;
 - (void)beep;
 - (void)stop;
+- (void)connectMorse;
+- (void)disconnectMorse;
+
 @end
 
