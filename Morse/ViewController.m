@@ -1,4 +1,4 @@
-//
+
 //  ViewController.m
 //  Morse
 //
@@ -16,6 +16,8 @@
 
 //#undef DEBUG
 #define TX
+
+//#define OLD_SOCKET
 
 OSStatus RenderTone(
                     void *inRefCon,
@@ -76,6 +78,8 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize img;
 @synthesize img2;
 
+
+#ifdef OLD_SOCKET
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa){
     if (sa->sa_family == AF_INET) {
@@ -83,6 +87,7 @@ void *get_in_addr(struct sockaddr *sa){
     }
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
+#endif
 
 // connect to server and send my id.
 - (void)
@@ -90,16 +95,33 @@ identifyclient
 {
     tx_sequence++;
     id_packet.sequence = tx_sequence;
+#ifdef OLD_SOCKET
     send(fd_socket, &connect_packet, SIZE_COMMAND_PACKET, 0);
     send(fd_socket, &id_packet, SIZE_DATA_PACKET, 0);
+#else
+    NSString *host = @"mtc-kob.dyndns.org";
+    int port = 7890;
+    NSData *data = [host dataUsingEncoding:NSUTF8StringEncoding];
+
+    //[udpSocket sendData:data toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    NSData *myData = [NSData dataWithBytes:&connect_packet length:sizeof(connect_packet)];
+    [udpSocket sendData:myData toHost:host port:port withTimeout:-1 tag:tx_sequence];
+
+   // [udpSocket sendData:(__bridge NSData *)(&connect_packet) toHost:host port:port withTimeout:-1 tag:tx_sequence];
+   // [udpSocket sendData:(__bridge NSData *)(&id_packet) toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    printf("sending data the new way");
+#endif
 }
+
+
 
 - (void)connectMorse
 {
     char hostname[64] = "mtc-kob.dyndns.org";
+    char port[16] = "7890";
+    
     char id[SIZE_ID] = "iOS GZ";
     int channel = 33;
-    char port[16] = "7890";
     
     prepare_id (&id_packet, id);
     prepare_tx (&tx_data_packet, id);
@@ -107,7 +129,6 @@ identifyclient
     
     txt1.text = [NSString stringWithFormat:@"Connecting to %s on %s \rdoes not show with channel %d and id %s ", hostname, port, channel, id];
   
-#ifdef OLD_SOCKET
     struct addrinfo hints, *servinfo, *p;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC; /* ipv4 or ipv6 */
@@ -119,7 +140,7 @@ identifyclient
        //error return 1;
     }
 
-    
+#ifdef OLD_SOCKET
     /* Find the first free socket */
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((fd_socket = socket(p->ai_family, p->ai_socktype,
@@ -138,6 +159,7 @@ identifyclient
         
         break;
     }
+    
 
     fcntl(fd_socket, F_SETFL, O_NONBLOCK);
     if (p == NULL) {
@@ -148,6 +170,7 @@ identifyclient
     
     char s[INET6_ADDRSTRLEN];
     
+    // get address of the server in text form into s
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
               s, sizeof s);
     txt1.text = [NSString stringWithFormat:@"connect to %s", s];
@@ -155,6 +178,28 @@ identifyclient
 
     freeaddrinfo(servinfo); /* all done with this structure */
 #else
+    udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    
+    NSError *error = nil;
+    
+    if (![udpSocket bindToPort:0 error:&error])
+    {
+        printf("error");
+        return;
+    }
+    if (![udpSocket beginReceiving:&error])
+    {
+        printf("error");
+        return;
+    }
+    
+
+    /*
+    NSString *host = @"mtc-kob.dyndns.org";
+    int port1 = 7890;
+    NSError *errPtr;
+    [udpSocket connectToHost:host onPort:port1 error:&errPtr];
+*/
 #endif
     
     [self identifyclient];
@@ -331,6 +376,10 @@ identifyclient
 
     /* Main Loop */
     for(;;) {
+        printf("hier");
+    }
+    return;
+    for (;;){
 #ifdef TX
         if(tx_timer == 0)
             if((numbytes = recv(fd_socket, buf, MAXDATASIZE-1, 0)) == -1)
