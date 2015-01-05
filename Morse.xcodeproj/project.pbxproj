@@ -15,6 +15,8 @@
 		7F1E35401A5AE782008D519D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E353F1A5AE782008D519D /* Images.xcassets */; };
 		7F1E35431A5AE782008D519D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E35411A5AE782008D519D /* LaunchScreen.xib */; };
 		7F1E354F1A5AE782008D519D /* MorseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E354E1A5AE782008D519D /* MorseTests.m */; };
+		7F1E355A1A5B0353008D519D /* one.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E35581A5B0353008D519D /* one.png */; };
+		7F1E355B1A5B0353008D519D /* two.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E35591A5B0353008D519D /* two.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +44,8 @@
 		7F1E35481A5AE782008D519D /* MorseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MorseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F1E354D1A5AE782008D519D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7F1E354E1A5AE782008D519D /* MorseTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MorseTests.m; sourceTree = "<group>"; };
+		7F1E35581A5B0353008D519D /* one.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = one.png; sourceTree = "<group>"; };
+		7F1E35591A5B0353008D519D /* two.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = two.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +103,8 @@
 		7F1E352F1A5AE782008D519D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				7F1E35581A5B0353008D519D /* one.png */,
+				7F1E35591A5B0353008D519D /* two.png */,
 				7F1E35301A5AE782008D519D /* Info.plist */,
 				7F1E35311A5AE782008D519D /* main.m */,
 			);
@@ -202,8 +208,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F1E355A1A5B0353008D519D /* one.png in Resources */,
 				7F1E353E1A5AE782008D519D /* Main.storyboard in Resources */,
 				7F1E35431A5AE782008D519D /* LaunchScreen.xib in Resources */,
+				7F1E355B1A5B0353008D519D /* two.png in Resources */,
 				7F1E35401A5AE782008D519D /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
