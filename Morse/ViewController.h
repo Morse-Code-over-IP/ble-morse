@@ -7,10 +7,26 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AudioUnit/AudioUnit.h>
+
 
 @interface ViewController : UIViewController
+{
+    UILabel *frequencyLabel;
+    UIButton *playButton;
+    UISlider *frequencySlider;
+    AudioComponentInstance toneUnit;
+    
+@public
+    double frequency;
+    double sampleRate;
+    double theta;
+}
+
+
 @property (weak, nonatomic) IBOutlet UIImageView *img;
 @property (weak, nonatomic) IBOutlet UIImageView *img2;
-
+- (void)beep;
+- (void)stop;
 @end
 
