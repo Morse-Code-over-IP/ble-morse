@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <AudioUnit/AudioUnit.h>
 #include "cwprotocol.h"
+#include "GCDAsyncUdpSocket.h"
 
 #define TX_WAIT  5000
 #define TX_TIMEOUT 240.0
@@ -39,6 +40,8 @@
 
     int last_message;
     char last_sender[16];
+    
+    GCDAsyncUdpSocket *udpSocket;
 }
 
 

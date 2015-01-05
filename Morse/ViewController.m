@@ -14,7 +14,8 @@
 #import <arpa/inet.h>
 #include "cwprotocol.h"
 
-
+//#undef DEBUG
+#define TX
 
 OSStatus RenderTone(
                     void *inRefCon,
@@ -98,16 +99,15 @@ identifyclient
     char hostname[64] = "mtc-kob.dyndns.org";
     char id[SIZE_ID] = "iOS GZ";
     int channel = 33;
-    
     char port[16] = "7890";
     
     prepare_id (&id_packet, id);
     prepare_tx (&tx_data_packet, id);
-    
     connect_packet.channel = channel;
+    
     txt1.text = [NSString stringWithFormat:@"Connecting to %s on %s \rdoes not show with channel %d and id %s ", hostname, port, channel, id];
   
-
+#ifdef OLD_SOCKET
     struct addrinfo hints, *servinfo, *p;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC; /* ipv4 or ipv6 */
@@ -154,11 +154,42 @@ identifyclient
     //message: printf("irmc: connected to %s\n", s);
 
     freeaddrinfo(servinfo); /* all done with this structure */
-
-    [self identifyclient];
+#else
+    // UDP Stuff - the new way
+    udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     
-  
+    NSError *error = nil;
+    if (![udpSocket bindToPort:0 error:&error]) //check ff of dit werkt!
+    {
+        return;
+    }
+    if (![udpSocket beginReceiving:&error])
+    {
+        return;
+    }
+#endif
+    
+    [self identifyclient];
+}
 
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
+      fromAddress:(NSData *)address
+withFilterContext:(id)filterContext
+{
+    NSLog(@"Did Receive Data");
+    NSString *msg = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    if (msg)
+    {
+        NSLog(@"Message: %@",msg);
+    }
+    else
+    {
+        NSString *host = nil;
+        uint16_t port = 0;
+        [GCDAsyncUdpSocket getHost:&host port:&port fromAddress:address];
+        
+        NSLog(@"Unknown Message: %@:%hu", host, port);
+    }
 }
 
 - (void)disconnectMorse
@@ -259,20 +290,19 @@ identifyclient
 }
 
 - (void)viewDidLoad {
-    UIImage *image1 = [UIImage         imageNamed:@"one.png"];
-    
-        UIImage *image2 = [UIImage         imageNamed:@"two.png"];
+    // Image Stuff
+    UIImage *image1 = [UIImage imageNamed:@"one.png"];
+    UIImage *image2 = [UIImage imageNamed:@"two.png"];
     [img setImage:image1];
     [img2 setImage:image2];
-    
     
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    // Audi stuff
     sampleRate = 44100;
-    
+
     //BOOL activated = [[AVAudioSession sharedInstance] setActive:YES error:&error];
-    
     OSStatus result = AudioSessionInitialize(NULL, NULL, ToneInterruptionListener, (__bridge void *)(self));
     if (result == kAudioSessionNoError)
     {
@@ -281,7 +311,7 @@ identifyclient
     }
     AudioSessionSetActive(true);
     
-
+    
     [self initCWvars];
     [self connectMorse];
     frequency = 800;
@@ -289,9 +319,10 @@ identifyclient
    
     sleep(1);
     [self beep];
-   // [self mainloop];
-
+    //[self mainloop];
 }
+
+
 - (void) message:(int) msg
 {
     switch(msg){
@@ -299,7 +330,7 @@ identifyclient
             if(last_message == msg) return;
             if(last_message == 2) printf("\n");
             last_message = msg;
-            printf("irmc: transmitting...\n");
+            txt1.text = [NSString stringWithFormat:@"Transmitting"];
             break;
         case 2:
             if(last_message == msg && strncmp(last_sender, rx_data_packet.id, 3) == 0) return;
@@ -307,19 +338,18 @@ identifyclient
                 if(last_message == 2) printf("\n");
                 last_message = msg;
                 strncpy(last_sender, rx_data_packet.id, 3);
-                printf("irmc: receiving...(%s)\n", rx_data_packet.id);
+                txt1.text = [NSString stringWithFormat:@"recv: (%s).",rx_data_packet.id];
             }
             break;
         case 3:
-            printf("irmc: circuit was latched by %s.\n", rx_data_packet.id);
+            txt1.text = [NSString stringWithFormat:@"irmc: circuit was latched by %s.",rx_data_packet.id];
             break;
         case 4:
-            printf("irmc: circuit was unlatched by %s.\n", rx_data_packet.id);
+            txt1.text = [NSString stringWithFormat:@"irmc: circuit was unlatched by %s.",rx_data_packet.id];
             break;
         default:
             break;
     }
-    fflush(0);
 }
 
 - (void)mainloop
@@ -333,9 +363,11 @@ identifyclient
 
     /* Main Loop */
     for(;;) {
+#ifdef TX
         if(tx_timer == 0)
             if((numbytes = recv(fd_socket, buf, MAXDATASIZE-1, 0)) == -1)
                 usleep(250);
+#endif
         if(numbytes == SIZE_DATA_PACKET && tx_timer == 0){
             memcpy(&rx_data_packet, buf, SIZE_DATA_PACKET);
 #if DEBUG
@@ -350,8 +382,7 @@ identifyclient
             if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
                 [self message:2];
                 if(translate == 1){
-                    printf("%s", rx_data_packet.status);
-                    fflush(0);
+                    txt1.text = [NSString stringWithFormat:@"%s",rx_data_packet.status];
                 }
                 rx_sequence = rx_data_packet.sequence;
                 for(i = 0; i < rx_data_packet.n; i++){
@@ -373,10 +404,18 @@ identifyclient
                                 {
                                     if(length < 0) {
                                         // beep me pause beep(0.0, abs(length)/1000.);
+                                        frequency = 0;
+                                        [self beep];
+                                        usleep(abs(length)/1000.);
+                                        [self beep];
                                     }
                                     else
                                     {
                                         // beep me beep(1000.0, length/1000.);
+                                        frequency = 1000;
+                                        [self beep];
+                                        usleep(abs(length)/1000.);
+                                        [self beep];
                                     }
                                 }
                             }
@@ -386,6 +425,7 @@ identifyclient
             }
         }
         
+#ifdef TX
         if(tx_timer > 0) tx_timer--;
         if(tx_data_packet.n > 1 ){
             tx_sequence++;
@@ -396,13 +436,14 @@ identifyclient
 #endif
             tx_data_packet.n = 0;
         }
-        /*serial stuff
-         ioctl(fd_serial,TIOCMGET, &serial_status);
+        
+        /*ioctl(fd_serial,TIOCMGET, &serial_status);
         if(serial_status & TIOCM_DSR){
             txloop();
             tx_timer = TX_WAIT;
-            message(1);
+            [self message:1];
         }*/
+#endif
         
         if(keepalive_t < 0 && tx_timer == 0){
 #if DEBUG
@@ -415,15 +456,8 @@ identifyclient
             keepalive_t--;
             usleep(50);	
         }
-        /*
-        
-        if(kbhit() && tx_timer == 0){
-            getchar(); // flush the buffer
-            if(commandmode()== 1)break;
-        }
-         */
+ 
     } /* End of mainloop */
-
 }
 
 - (void)didReceiveMemoryWarning {

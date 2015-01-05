@@ -18,6 +18,8 @@
 		7F1E354F1A5AE782008D519D /* MorseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E354E1A5AE782008D519D /* MorseTests.m */; };
 		7F1E355A1A5B0353008D519D /* one.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E35581A5B0353008D519D /* one.png */; };
 		7F1E355B1A5B0353008D519D /* two.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E35591A5B0353008D519D /* two.png */; };
+		7FC525C51A5B3150005A89CA /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FC525C21A5B3150005A89CA /* GCDAsyncSocket.m */; };
+		7FC525C61A5B3150005A89CA /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FC525C41A5B3150005A89CA /* GCDAsyncUdpSocket.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,10 @@
 		7F1E354E1A5AE782008D519D /* MorseTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MorseTests.m; sourceTree = "<group>"; };
 		7F1E35581A5B0353008D519D /* one.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = one.png; sourceTree = "<group>"; };
 		7F1E35591A5B0353008D519D /* two.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = two.png; sourceTree = "<group>"; };
+		7FC525C11A5B3150005A89CA /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		7FC525C21A5B3150005A89CA /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		7FC525C31A5B3150005A89CA /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
+		7FC525C41A5B3150005A89CA /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +101,10 @@
 				7F162FA81A5B0E2900945D4C /* cwprotocol.h */,
 				7F1E35391A5AE782008D519D /* ViewController.h */,
 				7F1E353A1A5AE782008D519D /* ViewController.m */,
+				7FC525C11A5B3150005A89CA /* GCDAsyncSocket.h */,
+				7FC525C21A5B3150005A89CA /* GCDAsyncSocket.m */,
+				7FC525C31A5B3150005A89CA /* GCDAsyncUdpSocket.h */,
+				7FC525C41A5B3150005A89CA /* GCDAsyncUdpSocket.m */,
 				7F162FA91A5B0E4600945D4C /* cwprotocol.c */,
 				7F1E353C1A5AE782008D519D /* Main.storyboard */,
 				7F1E353F1A5AE782008D519D /* Images.xcassets */,
@@ -235,9 +245,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FC525C51A5B3150005A89CA /* GCDAsyncSocket.m in Sources */,
 				7F1E35351A5AE782008D519D /* AppDelegate.m in Sources */,
 				7F1E35381A5AE782008D519D /* Morse.xcdatamodeld in Sources */,
 				7F1E353B1A5AE782008D519D /* ViewController.m in Sources */,
+				7FC525C61A5B3150005A89CA /* GCDAsyncUdpSocket.m in Sources */,
 				7F162FAA1A5B0E4600945D4C /* cwprotocol.c in Sources */,
 				7F1E35321A5AE782008D519D /* main.m in Sources */,
 			);
