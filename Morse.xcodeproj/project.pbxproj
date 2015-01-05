@@ -98,14 +98,10 @@
 			children = (
 				7F1E35331A5AE782008D519D /* AppDelegate.h */,
 				7F1E35341A5AE782008D519D /* AppDelegate.m */,
-				7F162FA81A5B0E2900945D4C /* cwprotocol.h */,
+				7FC525C81A5B366F005A89CA /* CWCom Protocol */,
 				7F1E35391A5AE782008D519D /* ViewController.h */,
 				7F1E353A1A5AE782008D519D /* ViewController.m */,
-				7FC525C11A5B3150005A89CA /* GCDAsyncSocket.h */,
-				7FC525C21A5B3150005A89CA /* GCDAsyncSocket.m */,
-				7FC525C31A5B3150005A89CA /* GCDAsyncUdpSocket.h */,
-				7FC525C41A5B3150005A89CA /* GCDAsyncUdpSocket.m */,
-				7F162FA91A5B0E4600945D4C /* cwprotocol.c */,
+				7FC525C71A5B3651005A89CA /* Networking */,
 				7F1E353C1A5AE782008D519D /* Main.storyboard */,
 				7F1E353F1A5AE782008D519D /* Images.xcassets */,
 				7F1E35411A5AE782008D519D /* LaunchScreen.xib */,
@@ -141,6 +137,26 @@
 				7F1E354D1A5AE782008D519D /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		7FC525C71A5B3651005A89CA /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				7FC525C31A5B3150005A89CA /* GCDAsyncUdpSocket.h */,
+				7FC525C41A5B3150005A89CA /* GCDAsyncUdpSocket.m */,
+				7FC525C11A5B3150005A89CA /* GCDAsyncSocket.h */,
+				7FC525C21A5B3150005A89CA /* GCDAsyncSocket.m */,
+			);
+			name = Networking;
+			sourceTree = "<group>";
+		};
+		7FC525C81A5B366F005A89CA /* CWCom Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				7F162FA81A5B0E2900945D4C /* cwprotocol.h */,
+				7F162FA91A5B0E4600945D4C /* cwprotocol.c */,
+			);
+			name = "CWCom Protocol";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

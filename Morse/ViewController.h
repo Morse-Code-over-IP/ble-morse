@@ -41,6 +41,7 @@
     int last_message;
     char last_sender[16];
     
+    // Networking
     GCDAsyncUdpSocket *udpSocket;
 }
 

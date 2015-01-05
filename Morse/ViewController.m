@@ -155,41 +155,9 @@ identifyclient
 
     freeaddrinfo(servinfo); /* all done with this structure */
 #else
-    // UDP Stuff - the new way
-    udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-    
-    NSError *error = nil;
-    if (![udpSocket bindToPort:0 error:&error]) //check ff of dit werkt!
-    {
-        return;
-    }
-    if (![udpSocket beginReceiving:&error])
-    {
-        return;
-    }
 #endif
     
     [self identifyclient];
-}
-
-- (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
-      fromAddress:(NSData *)address
-withFilterContext:(id)filterContext
-{
-    NSLog(@"Did Receive Data");
-    NSString *msg = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    if (msg)
-    {
-        NSLog(@"Message: %@",msg);
-    }
-    else
-    {
-        NSString *host = nil;
-        uint16_t port = 0;
-        [GCDAsyncUdpSocket getHost:&host port:&port fromAddress:address];
-        
-        NSLog(@"Unknown Message: %@:%hu", host, port);
-    }
 }
 
 - (void)disconnectMorse
