@@ -101,18 +101,16 @@ identifyclient
 #else
     NSString *host = @"mtc-kob.dyndns.org";
     int port = 7890;
-    NSData *data = [host dataUsingEncoding:NSUTF8StringEncoding];
 
-    //[udpSocket sendData:data toHost:host port:port withTimeout:-1 tag:tx_sequence];
-    NSData *myData = [NSData dataWithBytes:&connect_packet length:sizeof(connect_packet)];
-    [udpSocket sendData:myData toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    NSData *cc = [NSData dataWithBytes:&connect_packet length:sizeof(connect_packet)];
+    NSData *ii = [NSData dataWithBytes:&id_packet length:sizeof(id_packet)];
 
-   // [udpSocket sendData:(__bridge NSData *)(&connect_packet) toHost:host port:port withTimeout:-1 tag:tx_sequence];
-   // [udpSocket sendData:(__bridge NSData *)(&id_packet) toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    [udpSocket sendData:ii toHost:host port:port withTimeout:-1 tag:tx_sequence];
+
     printf("sending data the new way");
 #endif
 }
-
 
 
 - (void)connectMorse
@@ -207,8 +205,10 @@ identifyclient
 
 - (void)disconnectMorse
 {
+#ifdef OLD_SOCKET
     send(fd_socket, &disconnect_packet, SIZE_COMMAND_PACKET, 0);
     close(fd_socket);
+#endif
 }
 
 - (void)createToneUnit
@@ -330,8 +330,8 @@ identifyclient
     frequency = 800;
     [self beep];
    
-    sleep(1);
-    [self beep];
+    //sleep(1);
+    //[self beep];
     //[self mainloop];
 }
 
@@ -365,7 +365,7 @@ identifyclient
     }
 }
 
-- (void)mainloop
+- (void)mainloop  // do not use
 {
     char buf[MAXDATASIZE];
     int numbytes = 0,i;
@@ -387,7 +387,7 @@ identifyclient
 #endif
         if(numbytes == SIZE_DATA_PACKET && tx_timer == 0){
             memcpy(&rx_data_packet, buf, SIZE_DATA_PACKET);
-#if DEBUG
+#if DEBUG1
             printf("length: %i\n", rx_data_packet.length);
             printf("id: %s\n", rx_data_packet.id);
             printf("sequence no.: %i\n", rx_data_packet.sequence);
@@ -476,6 +476,83 @@ identifyclient
  
     } /* End of mainloop */
 }
+
+#ifndef OLD_SOCKET
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
+      fromAddress:(NSData *)address
+withFilterContext:(id)filterContext
+{
+    int i;
+    int translate = 0;
+    int audio_status = 1;
+    int keepalive_t = 0;
+    
+    [data getBytes:&rx_data_packet length:sizeof(rx_data_packet)];
+#ifdef DEBUG1
+        printf("length: %i\n", rx_data_packet.length);
+        printf("id: %s\n", rx_data_packet.id);
+        printf("sequence no.: %i\n", rx_data_packet.sequence);
+        printf("version: %s\n", rx_data_packet.status);
+        printf("n: %i\n", rx_data_packet.n);
+        printf("code:\n");
+        for(i = 0; i < SIZE_CODE; i++)printf("%i ", rx_data_packet.code[i]); printf("\n");
+#endif
+        if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
+            [self message:2];
+            if(translate == 1){
+                txt1.text = [NSString stringWithFormat:@"%s",rx_data_packet.status];
+            }
+            rx_sequence = rx_data_packet.sequence;
+            for(i = 0; i < rx_data_packet.n; i++){
+                switch(rx_data_packet.code[i]){
+                    case 1:
+                        [self message:3];
+                        break;
+                    case 2:
+                        [self message:4];
+                        break;
+                    default:
+                        if(audio_status == 1)
+                        {
+                            
+                            int length = rx_data_packet.code[i];
+                            if(length == 0 || abs(length) > 2000) {
+                            }
+                            else
+                            {
+                                if(length < 0) {
+                                    // beep me pause beep(0.0, abs(length)/1000.);
+                                    //frequency = 0;
+                                   // [self beep];
+                                    AudioOutputUnitStop(toneUnit);
+                                    usleep(abs(length)*1000.);
+                                   // [self beep];
+                                    AudioOutputUnitStop(toneUnit);
+                                    printf("pause");
+                                }
+                                else
+                                {
+                                    // beep me beep(1000.0, length/1000.);
+                                    //frequency = 1000;
+                                    //[self beep];
+                                    AudioOutputUnitStart(toneUnit);
+                                    usleep(abs(length)*1000.);
+                                    AudioOutputUnitStop(toneUnit);
+                                  //  [self beep];
+                                    printf("beep");
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    
+
+
+
+}
+#endif
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
