@@ -8,7 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import <AudioUnit/AudioUnit.h>
+#include "cwprotocol.h"
 
+#define TX_WAIT  5000
+#define TX_TIMEOUT 240.0
+#define KEEPALIVE_CYCLE 100
+
+#define MAXDATASIZE 1024 // max number of bytes we can get at once
 
 @interface ViewController : UIViewController
 {
@@ -22,6 +28,17 @@
     double sampleRate;
     double theta;
     int fd_socket;
+    struct command_packet_format connect_packet;
+    struct command_packet_format disconnect_packet;
+    struct data_packet_format id_packet;
+    struct data_packet_format rx_data_packet;
+    struct data_packet_format tx_data_packet;
+    
+    int tx_sequence, rx_sequence;
+    long tx_timer;
+
+    int last_message;
+    char last_sender[16];
 }
 
 
@@ -32,8 +49,10 @@
 - (void)stop;
 - (void)connectMorse;
 - (void)disconnectMorse;
+- (void)message:(int)msg;
 - (void)identifyclient;
 - (void)mainloop;
+- (void)initCWvars;
 
 @end
 

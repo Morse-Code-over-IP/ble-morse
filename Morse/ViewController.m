@@ -15,21 +15,6 @@
 #include "cwprotocol.h"
 
 
-struct command_packet_format connect_packet = {CON, DEFAULT_CHANNEL};
-struct command_packet_format disconnect_packet = {DIS, 0};
-struct data_packet_format id_packet;
-struct data_packet_format rx_data_packet;
-struct data_packet_format tx_data_packet;
-
-int tx_sequence = 0, rx_sequence;
-long tx_timer = 0;
-#define TX_WAIT  5000
-#define TX_TIMEOUT 240.0
-#define KEEPALIVE_CYCLE 100
-
-#define MAXDATASIZE 1024 // max number of bytes we can get at once
-int last_message = 0;
-char last_sender[16];
 
 OSStatus RenderTone(
                     void *inRefCon,
@@ -97,6 +82,7 @@ void *get_in_addr(struct sockaddr *sa){
     }
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
+
 // connect to server and send my id.
 - (void)
 identifyclient
@@ -110,10 +96,14 @@ identifyclient
 - (void)connectMorse
 {
     char hostname[64] = "mtc-kob.dyndns.org";
-    char id[SIZE_ID] = "Test iOS";
+    char id[SIZE_ID] = "iOS GZ";
     int channel = 33;
-    char port[16] = "7839";
+    
+    char port[16] = "7890";
+    
     prepare_id (&id_packet, id);
+    prepare_tx (&tx_data_packet, id);
+    
     connect_packet.channel = channel;
     txt1.text = [NSString stringWithFormat:@"Connecting to %s on %s \rdoes not show with channel %d and id %s ", hostname, port, channel, id];
   
@@ -257,6 +247,16 @@ identifyclient
     
 }
 
+- (void)initCWvars
+{
+    connect_packet.channel = DEFAULT_CHANNEL;
+    connect_packet.command = CON;
+    disconnect_packet.channel = 0;
+    disconnect_packet.command = DIS;
+    tx_sequence = 0;
+    tx_timer = 0;
+    last_message = 0;
+}
 
 - (void)viewDidLoad {
     UIImage *image1 = [UIImage         imageNamed:@"one.png"];
@@ -282,6 +282,7 @@ identifyclient
     AudioSessionSetActive(true);
     
 
+    [self initCWvars];
     [self connectMorse];
     frequency = 800;
     [self beep];
@@ -291,8 +292,7 @@ identifyclient
    // [self mainloop];
 
 }
-void
-message(int msg)
+- (void) message:(int) msg
 {
     switch(msg){
         case 1:
@@ -348,7 +348,7 @@ message(int msg)
             for(i = 0; i < SIZE_CODE; i++)printf("%i ", rx_data_packet.code[i]); printf("\n");
 #endif
             if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
-                message(2);
+                [self message:2];
                 if(translate == 1){
                     printf("%s", rx_data_packet.status);
                     fflush(0);
@@ -357,10 +357,10 @@ message(int msg)
                 for(i = 0; i < rx_data_packet.n; i++){
                     switch(rx_data_packet.code[i]){
                         case 1:
-                            message(3);
+                            [self message:3];
                             break;
                         case 2:
-                            message(4);
+                            [self message:4];
                             break;
                         default:
                             if(audio_status == 1)

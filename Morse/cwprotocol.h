@@ -1,3 +1,6 @@
+#ifndef __CWPROTOCOL__
+#define __CWPROTOCOL__
+
 #define INTERFACE_VERSION "irmc v0.02"
 
 // Structures for the packets: unsigned short command
@@ -14,6 +17,7 @@
 #define SIZE_STATUS 128
 #define SIZE_CODE 51
 // This structure will be used to (dis-)connect to KOB servers
+
 struct command_packet_format{
     	unsigned short command; // CON / DIS
     	unsigned short channel; // Channel number
@@ -41,3 +45,5 @@ struct data_packet_format{
 
 int prepare_id (struct data_packet_format *id_packet, char *id);
 int prepare_tx (struct data_packet_format *tx_packet, char *id);
+
+#endif
