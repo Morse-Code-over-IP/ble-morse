@@ -21,15 +21,19 @@
     double frequency;
     double sampleRate;
     double theta;
+    int fd_socket;
 }
 
 
+@property (weak, nonatomic) IBOutlet UILabel *txt1;
 @property (weak, nonatomic) IBOutlet UIImageView *img;
 @property (weak, nonatomic) IBOutlet UIImageView *img2;
 - (void)beep;
 - (void)stop;
 - (void)connectMorse;
 - (void)disconnectMorse;
+- (void)identifyclient;
+- (void)mainloop;
 
 @end
 

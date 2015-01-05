@@ -11,6 +11,7 @@
 #import <netdb.h>
 #import <netinet/in.h>
 #import <netinet6/in6.h>
+#import <arpa/inet.h>
 #include "cwprotocol.h"
 
 
@@ -18,6 +19,17 @@ struct command_packet_format connect_packet = {CON, DEFAULT_CHANNEL};
 struct command_packet_format disconnect_packet = {DIS, 0};
 struct data_packet_format id_packet;
 struct data_packet_format rx_data_packet;
+struct data_packet_format tx_data_packet;
+
+int tx_sequence = 0, rx_sequence;
+long tx_timer = 0;
+#define TX_WAIT  5000
+#define TX_TIMEOUT 240.0
+#define KEEPALIVE_CYCLE 100
+
+#define MAXDATASIZE 1024 // max number of bytes we can get at once
+int last_message = 0;
+char last_sender[16];
 
 OSStatus RenderTone(
                     void *inRefCon,
@@ -74,9 +86,26 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @end
 
 @implementation ViewController
-
+@synthesize txt1;
 @synthesize img;
 @synthesize img2;
+
+// get sockaddr, IPv4 or IPv6:
+void *get_in_addr(struct sockaddr *sa){
+    if (sa->sa_family == AF_INET) {
+        return &(((struct sockaddr_in*)sa)->sin_addr);
+    }
+    return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+// connect to server and send my id.
+- (void)
+identifyclient
+{
+    tx_sequence++;
+    id_packet.sequence = tx_sequence;
+    send(fd_socket, &connect_packet, SIZE_COMMAND_PACKET, 0);
+    send(fd_socket, &id_packet, SIZE_DATA_PACKET, 0);
+}
 
 - (void)connectMorse
 {
@@ -86,21 +115,66 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
     char port[16] = "7839";
     prepare_id (&id_packet, id);
     connect_packet.channel = channel;
-    
+    txt1.text = [NSString stringWithFormat:@"Connecting to %s on %s \rdoes not show with channel %d and id %s ", hostname, port, channel, id];
+  
+
     struct addrinfo hints, *servinfo, *p;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC; /* ipv4 or ipv6 */
     hints.ai_socktype = SOCK_DGRAM;
     int rv;
     if ((rv = getaddrinfo(hostname, port, &hints, &servinfo)) != 0) {
+        txt1.text = [NSString stringWithFormat:@"getaddrinfo: %s",gai_strerror(rv)];
        //error fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
        //error return 1;
     }
+
+    
+    /* Find the first free socket */
+    for(p = servinfo; p != NULL; p = p->ai_next) {
+        if ((fd_socket = socket(p->ai_family, p->ai_socktype,
+                                p->ai_protocol)) == -1) {
+            txt1.text = [NSString stringWithFormat:@"socket"];
+            // error perror("irmc: socket");
+            continue;
+        }
+        
+        if (connect(fd_socket, p->ai_addr, p->ai_addrlen) == -1) {
+            close(fd_socket);
+            txt1.text = [NSString stringWithFormat:@"connetct"];
+            //error perror("irmc: connect");
+            continue;
+        }
+        
+        break;
+    }
+
+    fcntl(fd_socket, F_SETFL, O_NONBLOCK);
+    if (p == NULL) {
+        txt1.text = [NSString stringWithFormat:@"failed to connect"];
+        //erroro fprintf(stderr, "irmc: failed to connect\n");
+        //error return 2;
+    }
+    
+    char s[INET6_ADDRSTRLEN];
+    
+    inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
+              s, sizeof s);
+    txt1.text = [NSString stringWithFormat:@"connect to %s", s];
+    //message: printf("irmc: connected to %s\n", s);
+
+    freeaddrinfo(servinfo); /* all done with this structure */
+
+    [self identifyclient];
+    
+  
 
 }
 
 - (void)disconnectMorse
 {
+    send(fd_socket, &disconnect_packet, SIZE_COMMAND_PACKET, 0);
+    close(fd_socket);
 }
 
 - (void)createToneUnit
@@ -212,7 +286,143 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
     frequency = 800;
     [self beep];
    
-    sleep(.2);
+    sleep(1);
+    [self beep];
+   // [self mainloop];
+
+}
+void
+message(int msg)
+{
+    switch(msg){
+        case 1:
+            if(last_message == msg) return;
+            if(last_message == 2) printf("\n");
+            last_message = msg;
+            printf("irmc: transmitting...\n");
+            break;
+        case 2:
+            if(last_message == msg && strncmp(last_sender, rx_data_packet.id, 3) == 0) return;
+            else {
+                if(last_message == 2) printf("\n");
+                last_message = msg;
+                strncpy(last_sender, rx_data_packet.id, 3);
+                printf("irmc: receiving...(%s)\n", rx_data_packet.id);
+            }
+            break;
+        case 3:
+            printf("irmc: circuit was latched by %s.\n", rx_data_packet.id);
+            break;
+        case 4:
+            printf("irmc: circuit was unlatched by %s.\n", rx_data_packet.id);
+            break;
+        default:
+            break;
+    }
+    fflush(0);
+}
+
+- (void)mainloop
+{
+    char buf[MAXDATASIZE];
+    int numbytes = 0,i;
+    int translate = 0;
+    int audio_status = 1;
+    int keepalive_t = 0;
+
+
+    /* Main Loop */
+    for(;;) {
+        if(tx_timer == 0)
+            if((numbytes = recv(fd_socket, buf, MAXDATASIZE-1, 0)) == -1)
+                usleep(250);
+        if(numbytes == SIZE_DATA_PACKET && tx_timer == 0){
+            memcpy(&rx_data_packet, buf, SIZE_DATA_PACKET);
+#if DEBUG
+            printf("length: %i\n", rx_data_packet.length);
+            printf("id: %s\n", rx_data_packet.id);
+            printf("sequence no.: %i\n", rx_data_packet.sequence);
+            printf("version: %s\n", rx_data_packet.status);
+            printf("n: %i\n", rx_data_packet.n);
+            printf("code:\n");
+            for(i = 0; i < SIZE_CODE; i++)printf("%i ", rx_data_packet.code[i]); printf("\n");
+#endif
+            if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
+                message(2);
+                if(translate == 1){
+                    printf("%s", rx_data_packet.status);
+                    fflush(0);
+                }
+                rx_sequence = rx_data_packet.sequence;
+                for(i = 0; i < rx_data_packet.n; i++){
+                    switch(rx_data_packet.code[i]){
+                        case 1:
+                            message(3);
+                            break;
+                        case 2:
+                            message(4);
+                            break;
+                        default:
+                            if(audio_status == 1)
+                            {
+                                
+                                int length = rx_data_packet.code[i];
+                                if(length == 0 || abs(length) > 2000) {
+                                }
+                                else
+                                {
+                                    if(length < 0) {
+                                        // beep me pause beep(0.0, abs(length)/1000.);
+                                    }
+                                    else
+                                    {
+                                        // beep me beep(1000.0, length/1000.);
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+        
+        if(tx_timer > 0) tx_timer--;
+        if(tx_data_packet.n > 1 ){
+            tx_sequence++;
+            tx_data_packet.sequence = tx_sequence;
+            for(i = 0; i < 5; i++) send(fd_socket, &tx_data_packet, SIZE_DATA_PACKET, 0);
+#if DEBUG		
+            printf("irmc: sent data packet.\n");
+#endif
+            tx_data_packet.n = 0;
+        }
+        /*serial stuff
+         ioctl(fd_serial,TIOCMGET, &serial_status);
+        if(serial_status & TIOCM_DSR){
+            txloop();
+            tx_timer = TX_WAIT;
+            message(1);
+        }*/
+        
+        if(keepalive_t < 0 && tx_timer == 0){
+#if DEBUG
+            printf("keep alive sent.\n");
+#endif
+            [self identifyclient];
+            keepalive_t = KEEPALIVE_CYCLE;
+        }
+        if(tx_timer == 0) {
+            keepalive_t--;
+            usleep(50);	
+        }
+        /*
+        
+        if(kbhit() && tx_timer == 0){
+            getchar(); // flush the buffer
+            if(commandmode()== 1)break;
+        }
+         */
+    } /* End of mainloop */
 
 }
 
@@ -238,6 +448,7 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
     self.playButton = nil;
     self.frequencySlider = nil;
     */
+    [self stop];
     AudioSessionSetActive(false);
     
 }
