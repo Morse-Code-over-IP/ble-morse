@@ -43,6 +43,11 @@
     
     // Networking
     GCDAsyncUdpSocket *udpSocket;
+    
+    // sending
+    long key_press_t1;
+    long key_release_t1;
+    long tx_timeout;
 }
 
 

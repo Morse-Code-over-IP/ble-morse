@@ -14,6 +14,10 @@
 #import <arpa/inet.h>
 #include "cwprotocol.h"
 
+#include <mach/clock.h>
+#include <mach/mach.h>
+
+
 //#undef DEBUG
 #define TX
 
@@ -110,7 +114,7 @@ identifyclient
     [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
     [udpSocket sendData:ii toHost:host port:port withTimeout:-1 tag:tx_sequence];
 
-    printf("sending data the new way");
+   // printf("sending data the new way");
 #endif
 }
 
@@ -302,6 +306,9 @@ identifyclient
     tx_sequence = 0;
     tx_timer = 0;
     last_message = 0;
+    tx_timeout = 0;
+    last_message = 0;
+
 }
 
 - (void)viewDidLoad {
@@ -336,18 +343,14 @@ identifyclient
     
     [mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
     [mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
-
-
-    
     
     [self initCWvars];
     [self connectMorse];
+    
     frequency = 800;
-    [self beep];
-   
-    //sleep(1);
-    //[self beep];
-    //[self mainloop];
+    [self beep]; // hack: must be run once for initialization
+    usleep(100*1000);
+    AudioOutputUnitStop(toneUnit);
 }
 
 
@@ -370,129 +373,16 @@ identifyclient
             }
             break;
         case 3:
-            txt1.text = [NSString stringWithFormat:@"irmc: circuit was latched by %s.",rx_data_packet.id];
+            txt1.text = [NSString stringWithFormat:@"latched by %s.",rx_data_packet.id];
             break;
         case 4:
-            txt1.text = [NSString stringWithFormat:@"irmc: circuit was unlatched by %s.",rx_data_packet.id];
+            txt1.text = [NSString stringWithFormat:@"unlatched by %s.",rx_data_packet.id];
             break;
         default:
             break;
     }
 }
 
-- (void)mainloop  // do not use
-{
-    char buf[MAXDATASIZE];
-    int numbytes = 0,i;
-    int translate = 0;
-    int audio_status = 1;
-    int keepalive_t = 0;
-
-
-    /* Main Loop */
-    for(;;) {
-        printf("hier");
-    }
-    return;
-    for (;;){
-#ifdef TX
-        if(tx_timer == 0)
-            if((numbytes = recv(fd_socket, buf, MAXDATASIZE-1, 0)) == -1)
-                usleep(250);
-#endif
-        if(numbytes == SIZE_DATA_PACKET && tx_timer == 0){
-            memcpy(&rx_data_packet, buf, SIZE_DATA_PACKET);
-#if DEBUG1
-            printf("length: %i\n", rx_data_packet.length);
-            printf("id: %s\n", rx_data_packet.id);
-            printf("sequence no.: %i\n", rx_data_packet.sequence);
-            printf("version: %s\n", rx_data_packet.status);
-            printf("n: %i\n", rx_data_packet.n);
-            printf("code:\n");
-            for(i = 0; i < SIZE_CODE; i++)printf("%i ", rx_data_packet.code[i]); printf("\n");
-#endif
-            if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
-                [self message:2];
-                if(translate == 1){
-                    txt1.text = [NSString stringWithFormat:@"%s",rx_data_packet.status];
-                }
-                rx_sequence = rx_data_packet.sequence;
-                for(i = 0; i < rx_data_packet.n; i++){
-                    switch(rx_data_packet.code[i]){
-                        case 1:
-                            [self message:3];
-                            break;
-                        case 2:
-                            [self message:4];
-                            break;
-                        default:
-                            if(audio_status == 1)
-                            {
-                                
-                                int length = rx_data_packet.code[i];
-                                if(length == 0 || abs(length) > 2000) {
-                                }
-                                else
-                                {
-                                    if(length < 0) {
-                                        // beep me pause beep(0.0, abs(length)/1000.);
-                                        frequency = 0;
-                                        [self beep];
-                                        usleep(abs(length)/1000.);
-                                        [self beep];
-                                    }
-                                    else
-                                    {
-                                        // beep me beep(1000.0, length/1000.);
-                                        frequency = 1000;
-                                        [self beep];
-                                        usleep(abs(length)/1000.);
-                                        [self beep];
-                                    }
-                                }
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-        
-#ifdef TX
-        if(tx_timer > 0) tx_timer--;
-        if(tx_data_packet.n > 1 ){
-            tx_sequence++;
-            tx_data_packet.sequence = tx_sequence;
-            for(i = 0; i < 5; i++) send(fd_socket, &tx_data_packet, SIZE_DATA_PACKET, 0);
-#if DEBUG		
-            printf("irmc: sent data packet.\n");
-#endif
-            tx_data_packet.n = 0;
-        }
-        
-        /*ioctl(fd_serial,TIOCMGET, &serial_status);
-        if(serial_status & TIOCM_DSR){
-            txloop();
-            tx_timer = TX_WAIT;
-            [self message:1];
-        }*/
-#endif
-        
-        if(keepalive_t < 0 && tx_timer == 0){
-#if DEBUG
-            printf("keep alive sent.\n");
-#endif
-            [self identifyclient];
-            keepalive_t = KEEPALIVE_CYCLE;
-        }
-        if(tx_timer == 0) {
-            keepalive_t--;
-            usleep(50);	
-        }
- 
-    } /* End of mainloop */
-}
-
-#ifndef OLD_SOCKET
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
@@ -529,32 +419,21 @@ withFilterContext:(id)filterContext
                     default:
                         if(audio_status == 1)
                         {
-                            
                             int length = rx_data_packet.code[i];
                             if(length == 0 || abs(length) > 2000) {
                             }
                             else
                             {
                                 if(length < 0) {
-                                    // beep me pause beep(0.0, abs(length)/1000.);
-                                    //frequency = 0;
-                                   // [self beep];
                                     AudioOutputUnitStop(toneUnit);
                                     usleep(abs(length)*1000.);
-                                   // [self beep];
                                     AudioOutputUnitStop(toneUnit);
-                                    printf("pause");
                                 }
                                 else
                                 {
-                                    // beep me beep(1000.0, length/1000.);
-                                    //frequency = 1000;
-                                    //[self beep];
                                     AudioOutputUnitStart(toneUnit);
                                     usleep(abs(length)*1000.);
                                     AudioOutputUnitStop(toneUnit);
-                                  //  [self beep];
-                                    printf("beep");
                                 }
                             }
                         }
@@ -567,7 +446,6 @@ withFilterContext:(id)filterContext
 
 
 }
-#endif
 
 
 - (void)didReceiveMemoryWarning {
@@ -587,16 +465,10 @@ withFilterContext:(id)filterContext
 }
 
 - (void)viewDidUnload {
-    /* The following stuff does not exist
-    self.frequencyLabel = nil;
-    self.playButton = nil;
-    self.frequencySlider = nil;
-    */
     [self stop];
     AudioSessionSetActive(false);
     
 }
-
 
 
 -(void)tapresp:(UITapGestureRecognizer *)sender{
@@ -604,61 +476,114 @@ withFilterContext:(id)filterContext
     AudioOutputUnitStop(toneUnit);
  
 }
+/* portable time, as listed in https://gist.github.com/jbenet/1087739  */
+void current_utc_time(struct timespec *ts) {
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    ts->tv_sec = mts.tv_sec;
+    ts->tv_nsec = mts.tv_nsec;
+}
+/* a better clock() in milliseconds */
+long
+fastclock(void)
+{
+    struct timespec t;
+    long r;
+    
+    current_utc_time (&t);
+    r = t.tv_sec * 1000;
+    r = r + t.tv_nsec / 1000000;
+    return r;
+}
 
 -(void)buttonIsDown
 {
     printf("down");
     AudioOutputUnitStart(toneUnit);
-
+    
+    key_press_t1 = fastclock();
+    tx_timeout = 0;
+    int timing = (int) ((key_press_t1 - key_release_t1) * -1); // negative timing
+    tx_data_packet.n++;
+    tx_data_packet.code[tx_data_packet.n - 1] = timing;
+    printf("timing: %d", timing);
+        //printf("space: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
+    
+     tx_timer = TX_WAIT;
+     [self message:1];
 }
+
 -(void)buttonWasReleased
 {
     printf("up");
     AudioOutputUnitStop(toneUnit);
+    key_release_t1 = fastclock();
+    
+    int timing =(int) ((key_release_t1 - key_press_t1) * 1); // positive timing
+    tx_data_packet.n++;
+    tx_data_packet.code[tx_data_packet.n - 1] = timing;
+    printf("timing: %d", timing);
 
+    
+    //printf("mark: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
+    /* TBD = TIMEOUT FOR keypress
+    while(1){
+        ioctl(fd_serial, TIOCMGET, &serial_status);
+        if(serial_status & TIOCM_DSR) break;
+        tx_timeout = fastclock() - key_release_t1;
+        if(tx_timeout > TX_TIMEOUT) return;
+    }
+    key_press_t1 = fastclock();
+    if(tx_data_packet.n == SIZE_CODE) {
+        printf("irmc: warning packet is full.\n");
+        return;
+    }
+*/
+    [self send_data];
 }
+
 
 
 -(void) send_data
 {
+    int  i;
+    NSString *host = @"mtc-kob.dyndns.org";
+    int port = 7890;
     
-    char buf[MAXDATASIZE];
-    int numbytes = 0,i;
-    int translate = 0;
-    int audio_status = 1;
-    int keepalive_t = 0;
     
     if(tx_timer > 0) tx_timer--;
+    
         if(tx_data_packet.n > 1 ){
             tx_sequence++;
             tx_data_packet.sequence = tx_sequence;
-            for(i = 0; i < 5; i++) send(fd_socket, &tx_data_packet, SIZE_DATA_PACKET, 0);
+            NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet )];
+
+            for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+                //send(fd_socket, &tx_data_packet, SIZE_DATA_PACKET, 0);
 #if DEBUG
             printf("irmc: sent data packet.\n");
 #endif
             tx_data_packet.n = 0;
         }
         
-        /*ioctl(fd_serial,TIOCMGET, &serial_status);
-         if(serial_status & TIOCM_DSR){
-         txloop();
-         tx_timer = TX_WAIT;
-         [self message:1];
-         }*/
-    
-        if(keepalive_t < 0 && tx_timer == 0){
-#if DEBUG
-            printf("keep alive sent.\n");
-#endif
-            [self identifyclient];
-            keepalive_t = KEEPALIVE_CYCLE;
-        }
-        if(tx_timer == 0) {
-            keepalive_t--;
-            usleep(50);
-        }
-        
 }
+
+/* TBD Keepalive separate
+ if(keepalive_t < 0 && tx_timer == 0){
+ #if DEBUG
+ printf("keep alive sent.\n");
+ #endif
+ [self identifyclient];
+ keepalive_t = KEEPALIVE_CYCLE;
+ }
+ if(tx_timer == 0) {
+ keepalive_t--;
+ usleep(50);
+ }
+*/
 
 
 @end
