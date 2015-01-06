@@ -53,17 +53,22 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *mybutton;
 @property (weak, nonatomic) IBOutlet UILabel *txt1;
+@property (weak, nonatomic) IBOutlet UILabel *txt_server;
+@property (weak, nonatomic) IBOutlet UILabel *txt_status;
+@property (weak, nonatomic) IBOutlet UILabel *txt_channel;
+@property (weak, nonatomic) IBOutlet UILabel *txt_id;
+
 @property (weak, nonatomic) IBOutlet UIImageView *img;
 @property (weak, nonatomic) IBOutlet UIImageView *img2;
+
 - (void)beep;
 - (void)stop;
 - (void)connectMorse;
 - (void)disconnectMorse;
 - (void)message:(int)msg;
 - (void)identifyclient;
-- (void)mainloop;
 - (void)initCWvars;
--(void)tapresp:(UITapGestureRecognizer *)sender;
+- (void)tapresp:(UITapGestureRecognizer *)sender; // TBD may away :)
 
 @end
 

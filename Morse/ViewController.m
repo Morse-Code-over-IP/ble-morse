@@ -79,6 +79,12 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 
 @implementation ViewController
 @synthesize txt1;
+@synthesize txt_server;
+@synthesize txt_status;
+@synthesize txt_channel;
+@synthesize txt_id;
+
+
 @synthesize img;
 @synthesize img2;
 @synthesize mybutton;
@@ -131,57 +137,22 @@ identifyclient
     prepare_tx (&tx_data_packet, id);
     connect_packet.channel = channel;
     
-    txt1.text = [NSString stringWithFormat:@"Connecting to %s on %s \rdoes not show with channel %d and id %s ", hostname, port, channel, id];
-  
+    
+    txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port];
+    txt_channel.text = [NSString stringWithFormat:@"ch: %d", channel];
+    txt_id.text = [NSString stringWithFormat:@"id: %s", id];
+    
     struct addrinfo hints, *servinfo, *p;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC; /* ipv4 or ipv6 */
     hints.ai_socktype = SOCK_DGRAM;
     int rv;
     if ((rv = getaddrinfo(hostname, port, &hints, &servinfo)) != 0) {
-        txt1.text = [NSString stringWithFormat:@"getaddrinfo: %s",gai_strerror(rv)];
+       // txt1.text = [NSString stringWithFormat:@"getaddrinfo: %s",gai_strerror(rv)];
        //error fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
        //error return 1;
     }
 
-#ifdef OLD_SOCKET
-    /* Find the first free socket */
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        if ((fd_socket = socket(p->ai_family, p->ai_socktype,
-                                p->ai_protocol)) == -1) {
-            txt1.text = [NSString stringWithFormat:@"socket"];
-            // error perror("irmc: socket");
-            continue;
-        }
-        
-        if (connect(fd_socket, p->ai_addr, p->ai_addrlen) == -1) {
-            close(fd_socket);
-            txt1.text = [NSString stringWithFormat:@"connetct"];
-            //error perror("irmc: connect");
-            continue;
-        }
-        
-        break;
-    }
-    
-
-    fcntl(fd_socket, F_SETFL, O_NONBLOCK);
-    if (p == NULL) {
-        txt1.text = [NSString stringWithFormat:@"failed to connect"];
-        //erroro fprintf(stderr, "irmc: failed to connect\n");
-        //error return 2;
-    }
-    
-    char s[INET6_ADDRSTRLEN];
-    
-    // get address of the server in text form into s
-    inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
-              s, sizeof s);
-    txt1.text = [NSString stringWithFormat:@"connect to %s", s];
-    //message: printf("irmc: connected to %s\n", s);
-
-    freeaddrinfo(servinfo); /* all done with this structure */
-#else
     udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     
     NSError *error = nil;
@@ -197,24 +168,12 @@ identifyclient
         return;
     }
     
-
-    /*
-    NSString *host = @"mtc-kob.dyndns.org";
-    int port1 = 7890;
-    NSError *errPtr;
-    [udpSocket connectToHost:host onPort:port1 error:&errPtr];
-*/
-#endif
-    
     [self identifyclient];
 }
 
 - (void)disconnectMorse
 {
-#ifdef OLD_SOCKET
-    send(fd_socket, &disconnect_packet, SIZE_COMMAND_PACKET, 0);
-    close(fd_socket);
-#endif
+
 }
 
 - (void)createToneUnit
@@ -361,7 +320,7 @@ identifyclient
             if(last_message == msg) return;
             if(last_message == 2) printf("\n");
             last_message = msg;
-            txt1.text = [NSString stringWithFormat:@"Transmitting"];
+            txt_status.text = [NSString stringWithFormat:@"Transmitting"];
             break;
         case 2:
             if(last_message == msg && strncmp(last_sender, rx_data_packet.id, 3) == 0) return;
@@ -369,14 +328,14 @@ identifyclient
                 if(last_message == 2) printf("\n");
                 last_message = msg;
                 strncpy(last_sender, rx_data_packet.id, 3);
-                txt1.text = [NSString stringWithFormat:@"recv: (%s).",rx_data_packet.id];
+                txt_status.text = [NSString stringWithFormat:@"recv: (%s).",rx_data_packet.id];
             }
             break;
         case 3:
-            txt1.text = [NSString stringWithFormat:@"latched by %s.",rx_data_packet.id];
+            txt_status.text = [NSString stringWithFormat:@"latched by %s.",rx_data_packet.id];
             break;
         case 4:
-            txt1.text = [NSString stringWithFormat:@"unlatched by %s.",rx_data_packet.id];
+            txt_status.text = [NSString stringWithFormat:@"unlatched by %s.",rx_data_packet.id];
             break;
         default:
             break;
@@ -405,7 +364,7 @@ withFilterContext:(id)filterContext
         if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
             [self message:2];
             if(translate == 1){
-                txt1.text = [NSString stringWithFormat:@"%s",rx_data_packet.status];
+                txt_status.text = [NSString stringWithFormat:@"%s",rx_data_packet.status];
             }
             rx_sequence = rx_data_packet.sequence;
             for(i = 0; i < rx_data_packet.n; i++){
