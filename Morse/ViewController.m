@@ -324,6 +324,13 @@ identifyclient
     }
     AudioSessionSetActive(true);
     
+    // Tap recog
+    
+    UITapGestureRecognizer * tapr = [[ UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapresp:)];
+    tapr.numberOfTapsRequired  = 1;
+    tapr.numberOfTouchesRequired = 1;
+    [self.view addGestureRecognizer:tapr];
+    
     
     [self initCWvars];
     [self connectMorse];
@@ -581,6 +588,11 @@ withFilterContext:(id)filterContext
     
 }
 
+
+
+-(void)tapresp:(UITapGestureRecognizer *)sender{
+    printf("tapped");
+}
 
 
 @end

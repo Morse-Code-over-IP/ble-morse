@@ -57,6 +57,7 @@
 - (void)identifyclient;
 - (void)mainloop;
 - (void)initCWvars;
+-(void)tapresp:(UITapGestureRecognizer *)sender;
 
 @end
 
