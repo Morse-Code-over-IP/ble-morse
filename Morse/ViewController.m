@@ -14,6 +14,8 @@
 #import <arpa/inet.h>
 #include "cwprotocol.h"
 
+#import <AVFoundation/AVFoundation.h>
+
 #include <mach/clock.h>
 #include <mach/mach.h>
 
@@ -81,6 +83,7 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize txt_status;
 @synthesize txt_channel;
 @synthesize txt_id;
+@synthesize webview;
 
 
 @synthesize img;
@@ -276,6 +279,16 @@ identifyclient
     [self beep]; // hack: must be run once for initialization
     usleep(100*1000);
     AudioOutputUnitStop(toneUnit);
+    
+    // Display web stuff
+    NSString *urlAddress = @"http://mtc-kob.dyndns.org";
+    NSURL *url = [NSURL URLWithString:urlAddress];
+    NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+    [webview loadRequest:requestObj];
+    
+    //myTimer = [NSTimer scheduledTimerWithTimeInterval: 30. target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
+    
+    // does not work yet [self play_clack];
 }
 
 
@@ -308,6 +321,48 @@ identifyclient
     }
 }
 
+
+-(BOOL) playSoundFXnamed: (NSString*) vSFXName Loop: (BOOL) vLoop
+{
+    NSError *error;
+    NSBundle* bundle = [NSBundle mainBundle];
+    NSString* bundleDirectory = (NSString*)[bundle bundlePath];
+    NSURL *url = [NSURL fileURLWithPath:[bundleDirectory stringByAppendingPathComponent:vSFXName]];
+    AVAudioPlayer *audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&error];
+    
+    if(vLoop)
+        audioPlayer.numberOfLoops = -1;
+    else
+        audioPlayer.numberOfLoops = 0;
+    
+    BOOL success = YES;
+    
+    if (audioPlayer == nil)
+    {
+        success = NO;
+        printf("no");
+    }
+    else
+    {
+        success = [audioPlayer play];
+        printf("yes");
+    }
+    return success;
+}
+
+
+- (void)play_clack
+{
+    printf("play clack");
+    [self playSoundFXnamed:@"clack48.wav" Loop: NO];
+#ifdef okok
+    SystemSoundID completeSound;
+    NSURL *audioPath = [[NSBundle mainBundle] URLForResource:@"clack48.wav" withExtension:@"wav"];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)audioPath, &completeSound);
+    AudioServicesPlaySystemSound (completeSound);
+#endif
+}
+
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
@@ -326,6 +381,7 @@ withFilterContext:(id)filterContext
         printf("code:\n");
         for(i = 0; i < SIZE_CODE; i++)printf("%i ", rx_data_packet.code[i]); printf("\n");
 #endif
+    txt_status.text = [NSString stringWithFormat:@"recv from: %s", rx_data_packet.id];
         if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
             [self message:2];
             if(translate == 1){
@@ -492,19 +548,10 @@ fastclock(void)
         
 }
 
-/* TBD Keepalive separate
- if(keepalive_t < 0 && tx_timer == 0){
- #if DEBUG
- printf("keep alive sent.\n");
- #endif
- [self identifyclient];
- keepalive_t = KEEPALIVE_CYCLE;
- }
- if(tx_timer == 0) {
- keepalive_t--;
- usleep(50);
- }
-*/
-
+-(void) sendkeepalive:(NSTimer*)t
+{
+    // check if we are sending? FIXME
+    //[self identifyclient];
+}
 
 @end

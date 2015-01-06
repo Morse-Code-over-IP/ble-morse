@@ -29,6 +29,7 @@
     double sampleRate;
     double theta;
     int fd_socket;
+    NSTimer*  myTimer;
     struct command_packet_format connect_packet;
     struct command_packet_format disconnect_packet;
     struct data_packet_format id_packet;
@@ -62,6 +63,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *txt_status;
 @property (weak, nonatomic) IBOutlet UILabel *txt_channel;
 @property (weak, nonatomic) IBOutlet UILabel *txt_id;
+@property (weak, nonatomic) IBOutlet UIWebView *webview;
 
 @property (weak, nonatomic) IBOutlet UIImageView *img;
 @property (weak, nonatomic) IBOutlet UIImageView *img2;
