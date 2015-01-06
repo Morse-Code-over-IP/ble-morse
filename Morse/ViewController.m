@@ -77,6 +77,8 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize txt1;
 @synthesize img;
 @synthesize img2;
+@synthesize mybutton;
+
 
 
 #ifdef OLD_SOCKET
@@ -326,10 +328,16 @@ identifyclient
     
     // Tap recog
     
-    UITapGestureRecognizer * tapr = [[ UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapresp:)];
+   /* UITapGestureRecognizer * tapr = [[ UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapresp:)];
     tapr.numberOfTapsRequired  = 1;
     tapr.numberOfTouchesRequired = 1;
     [self.view addGestureRecognizer:tapr];
+    */
+    
+    [mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
+    [mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
+
+
     
     
     [self initCWvars];
@@ -561,6 +569,7 @@ withFilterContext:(id)filterContext
 }
 #endif
 
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -592,6 +601,63 @@ withFilterContext:(id)filterContext
 
 -(void)tapresp:(UITapGestureRecognizer *)sender{
     printf("tapped");
+    AudioOutputUnitStop(toneUnit);
+ 
+}
+
+-(void)buttonIsDown
+{
+    printf("down");
+    AudioOutputUnitStart(toneUnit);
+
+}
+-(void)buttonWasReleased
+{
+    printf("up");
+    AudioOutputUnitStop(toneUnit);
+
+}
+
+
+-(void) send_data
+{
+    
+    char buf[MAXDATASIZE];
+    int numbytes = 0,i;
+    int translate = 0;
+    int audio_status = 1;
+    int keepalive_t = 0;
+    
+    if(tx_timer > 0) tx_timer--;
+        if(tx_data_packet.n > 1 ){
+            tx_sequence++;
+            tx_data_packet.sequence = tx_sequence;
+            for(i = 0; i < 5; i++) send(fd_socket, &tx_data_packet, SIZE_DATA_PACKET, 0);
+#if DEBUG
+            printf("irmc: sent data packet.\n");
+#endif
+            tx_data_packet.n = 0;
+        }
+        
+        /*ioctl(fd_serial,TIOCMGET, &serial_status);
+         if(serial_status & TIOCM_DSR){
+         txloop();
+         tx_timer = TX_WAIT;
+         [self message:1];
+         }*/
+    
+        if(keepalive_t < 0 && tx_timer == 0){
+#if DEBUG
+            printf("keep alive sent.\n");
+#endif
+            [self identifyclient];
+            keepalive_t = KEEPALIVE_CYCLE;
+        }
+        if(tx_timer == 0) {
+            keepalive_t--;
+            usleep(50);
+        }
+        
 }
 
 

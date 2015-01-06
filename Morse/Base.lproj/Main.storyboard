@@ -28,6 +28,12 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3vs-d3-cnu">
                                 <rect key="frame" x="269" y="467" width="102" height="86"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7sn-iI-3Y1">
+                                <rect key="frame" x="16" y="102" width="30" height="30"/>
+                                <state key="normal" title="Key">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
@@ -35,6 +41,7 @@
                     <connections>
                         <outlet property="img" destination="3vs-d3-cnu" id="sU9-al-wuy"/>
                         <outlet property="img2" destination="fS6-cK-25E" id="Ew3-oB-3hD"/>
+                        <outlet property="mybutton" destination="7sn-iI-3Y1" id="Szm-Ui-O31"/>
                         <outlet property="txt1" destination="bs2-ca-NXU" id="jx5-xL-QE7"/>
                     </connections>
                 </viewController>
