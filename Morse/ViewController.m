@@ -21,8 +21,6 @@
 //#undef DEBUG
 #define TX
 
-//#define OLD_SOCKET
-
 OSStatus RenderTone(
                     void *inRefCon,
                     AudioUnitRenderActionFlags 	*ioActionFlags,
@@ -89,48 +87,26 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize img2;
 @synthesize mybutton;
 
-
-
-#ifdef OLD_SOCKET
-// get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa){
-    if (sa->sa_family == AF_INET) {
-        return &(((struct sockaddr_in*)sa)->sin_addr);
-    }
-    return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-#endif
-
 // connect to server and send my id.
 - (void)
 identifyclient
 {
     tx_sequence++;
     id_packet.sequence = tx_sequence;
-#ifdef OLD_SOCKET
-    send(fd_socket, &connect_packet, SIZE_COMMAND_PACKET, 0);
-    send(fd_socket, &id_packet, SIZE_DATA_PACKET, 0);
-#else
-    NSString *host = @"mtc-kob.dyndns.org";
-    int port = 7890;
 
     NSData *cc = [NSData dataWithBytes:&connect_packet length:sizeof(connect_packet)];
     NSData *ii = [NSData dataWithBytes:&id_packet length:sizeof(id_packet)];
 
     [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
     [udpSocket sendData:ii toHost:host port:port withTimeout:-1 tag:tx_sequence];
-
-   // printf("sending data the new way");
-#endif
 }
 
 
 - (void)connectMorse
 {
-    char hostname[64] = "mtc-kob.dyndns.org";
-    char port[16] = "7890";
-    
-    char id[SIZE_ID] = "iOS GZ";
+    char hostname[64] = "mtc-kob.dyndns.org"; // FIXME - make global
+    char port1[16] = "7890";
+    char id[SIZE_ID] = "iOS GZ"; // FIXME - make global
     int channel = 33;
     
     prepare_id (&id_packet, id);
@@ -138,25 +114,13 @@ identifyclient
     connect_packet.channel = channel;
     
     
-    txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port];
+    txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port1];
     txt_channel.text = [NSString stringWithFormat:@"ch: %d", channel];
     txt_id.text = [NSString stringWithFormat:@"id: %s", id];
-    
-    struct addrinfo hints, *servinfo, *p;
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC; /* ipv4 or ipv6 */
-    hints.ai_socktype = SOCK_DGRAM;
-    int rv;
-    if ((rv = getaddrinfo(hostname, port, &hints, &servinfo)) != 0) {
-       // txt1.text = [NSString stringWithFormat:@"getaddrinfo: %s",gai_strerror(rv)];
-       //error fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-       //error return 1;
-    }
-
+   
     udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     
     NSError *error = nil;
-    
     if (![udpSocket bindToPort:0 error:&error])
     {
         printf("error");
@@ -173,7 +137,6 @@ identifyclient
 
 - (void)disconnectMorse
 {
-
 }
 
 - (void)createToneUnit
@@ -267,6 +230,9 @@ identifyclient
     last_message = 0;
     tx_timeout = 0;
     last_message = 0;
+    
+    host = @"mtc-kob.dyndns.org";
+    port = 7890;
 
 }
 
@@ -349,7 +315,6 @@ withFilterContext:(id)filterContext
     int i;
     int translate = 0;
     int audio_status = 1;
-    int keepalive_t = 0;
     
     [data getBytes:&rx_data_packet length:sizeof(rx_data_packet)];
 #ifdef DEBUG1
@@ -460,7 +425,7 @@ fastclock(void)
 
 -(void)buttonIsDown
 {
-    printf("down");
+    //printf("down");
     AudioOutputUnitStart(toneUnit);
     
     key_press_t1 = fastclock();
@@ -468,7 +433,7 @@ fastclock(void)
     int timing = (int) ((key_press_t1 - key_release_t1) * -1); // negative timing
     tx_data_packet.n++;
     tx_data_packet.code[tx_data_packet.n - 1] = timing;
-    printf("timing: %d", timing);
+    //printf("timing: %d", timing);
         //printf("space: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
     
      tx_timer = TX_WAIT;
@@ -477,14 +442,14 @@ fastclock(void)
 
 -(void)buttonWasReleased
 {
-    printf("up");
+    //printf("up");
     AudioOutputUnitStop(toneUnit);
     key_release_t1 = fastclock();
     
     int timing =(int) ((key_release_t1 - key_press_t1) * 1); // positive timing
     tx_data_packet.n++;
     tx_data_packet.code[tx_data_packet.n - 1] = timing;
-    printf("timing: %d", timing);
+    //printf("timing: %d", timing);
 
     
     //printf("mark: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
@@ -509,10 +474,7 @@ fastclock(void)
 -(void) send_data
 {
     int  i;
-    NSString *host = @"mtc-kob.dyndns.org";
-    int port = 7890;
-    
-    
+
     if(tx_timer > 0) tx_timer--;
     
         if(tx_data_packet.n > 1 ){

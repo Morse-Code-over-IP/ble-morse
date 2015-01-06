@@ -35,9 +35,14 @@
     struct data_packet_format rx_data_packet;
     struct data_packet_format tx_data_packet;
     
+    // server connecting
+    NSString *host;
+    int port;
+
     int tx_sequence, rx_sequence;
     long tx_timer;
 
+    // message queues
     int last_message;
     char last_sender[16];
     
