@@ -13,9 +13,11 @@
 
 #define TX_WAIT  5000
 #define TX_TIMEOUT 240.0
-#define KEEPALIVE_CYCLE 100
+#define KEEPALIVE_CYCLE 100 //msec
 
 #define MAXDATASIZE 1024 // max number of bytes we can get at once
+#define LATCHED 0
+#define UNLATCHED 1
 
 @interface ViewController : UIViewController
 {
@@ -54,10 +56,14 @@
     long key_press_t1;
     long key_release_t1;
     long tx_timeout;
+    
+    int circuit;
 }
 
 
 @property (weak, nonatomic) IBOutlet UIButton *mybutton;
+@property (weak, nonatomic) IBOutlet UIButton *btn_circuit;
+
 @property (weak, nonatomic) IBOutlet UILabel *txt1;
 @property (weak, nonatomic) IBOutlet UILabel *txt_server;
 @property (weak, nonatomic) IBOutlet UILabel *txt_status;

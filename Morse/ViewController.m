@@ -89,6 +89,7 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize img;
 @synthesize img2;
 @synthesize mybutton;
+@synthesize btn_circuit;
 
 // connect to server and send my id.
 - (void)
@@ -126,12 +127,12 @@ identifyclient
     NSError *error = nil;
     if (![udpSocket bindToPort:0 error:&error])
     {
-        printf("error");
+        NSLog(@"error");
         return;
     }
     if (![udpSocket beginReceiving:&error])
     {
-        printf("error");
+        NSLog(@"error");
         return;
     }
     
@@ -229,14 +230,28 @@ identifyclient
     disconnect_packet.channel = 0;
     disconnect_packet.command = DIS;
     tx_sequence = 0;
-    tx_timer = 0;
     last_message = 0;
     tx_timeout = 0;
     last_message = 0;
+    circuit = LATCHED;
     
     host = @"mtc-kob.dyndns.org";
     port = 7890;
 
+}
+
+- (void)switchcircuit
+{
+    if (circuit == LATCHED)
+    {
+        circuit = UNLATCHED;
+        [self unlatch];
+    }
+    else
+    {
+        circuit = LATCHED;
+        [self latch];
+    }
 }
 
 - (void)viewDidLoad {
@@ -272,6 +287,8 @@ identifyclient
     [mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
     [mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
     
+    [btn_circuit addTarget:self action:@selector(switchcircuit) forControlEvents:UIControlEventTouchDown];
+    
     [self initCWvars];
     [self connectMorse];
     
@@ -285,8 +302,8 @@ identifyclient
     NSURL *url = [NSURL URLWithString:urlAddress];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webview loadRequest:requestObj];
-    
-    //myTimer = [NSTimer scheduledTimerWithTimeInterval: 30. target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
+
+    myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
     
     // does not work yet [self play_clack];
 }
@@ -297,14 +314,14 @@ identifyclient
     switch(msg){
         case 1:
             if(last_message == msg) return;
-            if(last_message == 2) printf("\n");
+            if(last_message == 2) NSLog(@"\n");
             last_message = msg;
             txt_status.text = [NSString stringWithFormat:@"Transmitting"];
             break;
         case 2:
             if(last_message == msg && strncmp(last_sender, rx_data_packet.id, 3) == 0) return;
             else {
-                if(last_message == 2) printf("\n");
+                if(last_message == 2) NSLog(@"\n");
                 last_message = msg;
                 strncpy(last_sender, rx_data_packet.id, 3);
                 txt_status.text = [NSString stringWithFormat:@"recv: (%s).",rx_data_packet.id];
@@ -340,12 +357,12 @@ identifyclient
     if (audioPlayer == nil)
     {
         success = NO;
-        printf("no");
+        NSLog(@"no");
     }
     else
     {
         success = [audioPlayer play];
-        printf("yes");
+        NSLog(@"yes");
     }
     return success;
 }
@@ -353,7 +370,7 @@ identifyclient
 
 - (void)play_clack
 {
-    printf("play clack");
+    NSLog(@"play clack");
     [self playSoundFXnamed:@"clack48.wav" Loop: NO];
 #ifdef okok
     SystemSoundID completeSound;
@@ -373,13 +390,13 @@ withFilterContext:(id)filterContext
     
     [data getBytes:&rx_data_packet length:sizeof(rx_data_packet)];
 #ifdef DEBUG1
-        printf("length: %i\n", rx_data_packet.length);
-        printf("id: %s\n", rx_data_packet.id);
-        printf("sequence no.: %i\n", rx_data_packet.sequence);
-        printf("version: %s\n", rx_data_packet.status);
-        printf("n: %i\n", rx_data_packet.n);
-        printf("code:\n");
-        for(i = 0; i < SIZE_CODE; i++)printf("%i ", rx_data_packet.code[i]); printf("\n");
+        NSLog(@"length: %i\n", rx_data_packet.length);
+        NSLog(@"id: %s\n", rx_data_packet.id);
+        NSLog(@"sequence no.: %i\n", rx_data_packet.sequence);
+        NSLog(@"version: %s\n", rx_data_packet.status);
+        NSLog(@"n: %i\n", rx_data_packet.n);
+        NSLog(@"code:\n");
+        for(i = 0; i < SIZE_CODE; i++)NSLog(@"%i ", rx_data_packet.code[i]); NSLog(@"\n");
 #endif
     txt_status.text = [NSString stringWithFormat:@"recv from: %s", rx_data_packet.id];
         if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
@@ -452,7 +469,7 @@ withFilterContext:(id)filterContext
 
 
 -(void)tapresp:(UITapGestureRecognizer *)sender{
-    printf("tapped");
+    NSLog(@"tapped");
     AudioOutputUnitStop(toneUnit);
  
 }
@@ -481,35 +498,34 @@ fastclock(void)
 
 -(void)buttonIsDown
 {
-    //printf("down");
     AudioOutputUnitStart(toneUnit);
     
     key_press_t1 = fastclock();
     tx_timeout = 0;
     int timing = (int) ((key_press_t1 - key_release_t1) * -1); // negative timing
+    if (timing > TX_WAIT) timing = TX_WAIT; // limit to timeout
     tx_data_packet.n++;
     tx_data_packet.code[tx_data_packet.n - 1] = timing;
-    //printf("timing: %d", timing);
-        //printf("space: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
+    NSLog(@"timing: %d", timing);
     
-     tx_timer = TX_WAIT;
-     [self message:1];
+    [self message:1];
 }
 
 -(void)buttonWasReleased
 {
-    //printf("up");
     AudioOutputUnitStop(toneUnit);
     key_release_t1 = fastclock();
     
     int timing =(int) ((key_release_t1 - key_press_t1) * 1); // positive timing
+    if (abs(timing) > TX_WAIT) timing = -TX_WAIT; // limit to timeout FIXME this is the negative part
+    if (tx_data_packet.n == SIZE_CODE) NSLog(@"warning: packet is full");
     tx_data_packet.n++;
     tx_data_packet.code[tx_data_packet.n - 1] = timing;
-    //printf("timing: %d", timing);
+    NSLog(@"timing: %d", timing);
 
     
-    //printf("mark: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
-    /* TBD = TIMEOUT FOR keypress
+    //NSLog(@"mark: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
+    /* TBD = TIMEOUT FOR keypress maximal 5 seconds
     while(1){
         ioctl(fd_serial, TIOCMGET, &serial_status);
         if(serial_status & TIOCM_DSR) break;
@@ -518,7 +534,7 @@ fastclock(void)
     }
     key_press_t1 = fastclock();
     if(tx_data_packet.n == SIZE_CODE) {
-        printf("irmc: warning packet is full.\n");
+        NSLog(@"irmc: warning packet is full.\n");
         return;
     }
 */
@@ -526,32 +542,75 @@ fastclock(void)
 }
 
 
-
 -(void) send_data
 {
-    int  i;
+    int i;
+GCDAsyncUdpSocket *udpSocket1;
 
-    if(tx_timer > 0) tx_timer--;
+    if (tx_data_packet.code[0]>0) return; // assert first pause
     
-        if(tx_data_packet.n > 1 ){
+        if(tx_data_packet.n > 1 ){ // assert only two packages
             tx_sequence++;
             tx_data_packet.sequence = tx_sequence;
-            NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet )];
+            NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
 
-            for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
-                //send(fd_socket, &tx_data_packet, SIZE_DATA_PACKET, 0);
+            for(i = 0; i < 5; i++) {
+                
+            [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+               // int fd_socket;
+             //   send(fd_socket, &tx_data_packet, SIZE_DATA_PACKET, 0);
+            }
 #if DEBUG
-            printf("irmc: sent data packet.\n");
+            NSLog(@"sent seq %d n %d (%d,%d).", tx_sequence, tx_data_packet.n,
+            tx_data_packet.code[0] ,
+            tx_data_packet.code[1]
+                  );
 #endif
             tx_data_packet.n = 0;
         }
+        else { NSLog(@"This should not happen");}
         
+}
+
+
+- (void)latch
+{
+    int i;
+    tx_sequence++;
+    tx_data_packet.sequence = tx_sequence;
+    tx_data_packet.code[0] = -1;
+    tx_data_packet.code[1] = 1;
+    tx_data_packet.n = 2;
+    
+    NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
+    for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    
+    tx_data_packet.n = 0;
+    NSLog(@"latch");
+}
+
+-(void) unlatch
+{
+    int i;
+    tx_sequence++;
+    tx_data_packet.sequence = tx_sequence;
+    tx_data_packet.code[0] = -1;
+    tx_data_packet.code[1] = 2;
+    tx_data_packet.n = 2;
+    
+    NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
+    for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    
+    tx_data_packet.n = 0;
+    NSLog(@"unlatch");
+    
 }
 
 -(void) sendkeepalive:(NSTimer*)t
 {
     // check if we are sending? FIXME
-    //[self identifyclient];
+    NSLog(@"Keepalive");
+    [self identifyclient];
 }
 
 @end
