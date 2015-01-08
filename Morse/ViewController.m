@@ -117,7 +117,6 @@ identifyclient
     prepare_tx (&tx_data_packet, id);
     connect_packet.channel = channel;
     
-    
     txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port1];
     txt_channel.text = [NSString stringWithFormat:@"ch: %d", channel];
     txt_id.text = [NSString stringWithFormat:@"id: %s", id];
@@ -135,7 +134,6 @@ identifyclient
         NSLog(@"error");
         return;
     }
-    
     [self identifyclient];
 }
 
@@ -257,7 +255,7 @@ identifyclient
 - (void)viewDidLoad {
     // Image Stuff
     UIImage *image1 = [UIImage imageNamed:@"one.png"];
-    UIImage *image2 = [UIImage imageNamed:@"two.png"];
+    UIImage *image2 = [UIImage imageNamed:@"key.jpg"];
     [img setImage:image1];
     [img2 setImage:image2];
     
