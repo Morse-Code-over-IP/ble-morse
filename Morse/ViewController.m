@@ -110,7 +110,7 @@ identifyclient
 {
     char hostname[64] = "mtc-kob.dyndns.org"; // FIXME - make global
     char port1[16] = "7890";
-    char id[SIZE_ID] = "iOS GZ"; // FIXME - make global
+    char id[SIZE_ID] = "iOS/DG6FL, intl. Morse"; // FIXME - make global
     int channel = 33;
     
     prepare_id (&id_packet, id);
@@ -506,8 +506,7 @@ fastclock(void)
     if (timing > TX_WAIT) timing = TX_WAIT; // limit to timeout
     tx_data_packet.n++;
     tx_data_packet.code[tx_data_packet.n - 1] = timing;
-    NSLog(@"timing: %d", timing);
-    
+    //NSLog(@"timing: %d", timing);
     [self message:1];
 }
 
@@ -521,7 +520,7 @@ fastclock(void)
     if (tx_data_packet.n == SIZE_CODE) NSLog(@"warning: packet is full");
     tx_data_packet.n++;
     tx_data_packet.code[tx_data_packet.n - 1] = timing;
-    NSLog(@"timing: %d", timing);
+    //NSLog(@"timing: %d", timing);
 
     
     //NSLog(@"mark: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
@@ -544,46 +543,40 @@ fastclock(void)
 
 -(void) send_data
 {
-    int i;
-GCDAsyncUdpSocket *udpSocket1;
 
-    if (tx_data_packet.code[0]>0) return; // assert first pause
+    //if (tx_data_packet.code[0]>0) return; // assert first pause
     
-        if(tx_data_packet.n > 1 ){ // assert only two packages
-            tx_sequence++;
-            tx_data_packet.sequence = tx_sequence;
-            NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
+    if(tx_data_packet.n == 2 ) return; // assert only two packages
+    
+    tx_sequence++;
+    tx_data_packet.sequence = tx_sequence;
 
-            for(i = 0; i < 5; i++) {
-                
-            [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
-               // int fd_socket;
-             //   send(fd_socket, &tx_data_packet, SIZE_DATA_PACKET, 0);
-            }
-#if DEBUG
-            NSLog(@"sent seq %d n %d (%d,%d).", tx_sequence, tx_data_packet.n,
-            tx_data_packet.code[0] ,
-            tx_data_packet.code[1]
-                  );
-#endif
-            tx_data_packet.n = 0;
-        }
-        else { NSLog(@"This should not happen");}
-        
+    [self send_tx_packet];
+    tx_data_packet.n = 0;
+
 }
 
-
-- (void)latch
+- (void) send_tx_packet
 {
     int i;
+    NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
+    for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+#if DEBUG
+    NSLog(@"sent seq %d n %d (%d,%d).", tx_sequence, tx_data_packet.n,
+          tx_data_packet.code[0] ,
+          tx_data_packet.code[1]
+          );
+#endif
+}
+- (void)latch
+{
     tx_sequence++;
     tx_data_packet.sequence = tx_sequence;
     tx_data_packet.code[0] = -1;
     tx_data_packet.code[1] = 1;
     tx_data_packet.n = 2;
     
-    NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
-    for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    [self send_tx_packet];
     
     tx_data_packet.n = 0;
     NSLog(@"latch");
@@ -591,15 +584,13 @@ GCDAsyncUdpSocket *udpSocket1;
 
 -(void) unlatch
 {
-    int i;
     tx_sequence++;
     tx_data_packet.sequence = tx_sequence;
     tx_data_packet.code[0] = -1;
     tx_data_packet.code[1] = 2;
     tx_data_packet.n = 2;
     
-    NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
-    for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    [self send_tx_packet];
     
     tx_data_packet.n = 0;
     NSLog(@"unlatch");
@@ -608,8 +599,7 @@ GCDAsyncUdpSocket *udpSocket1;
 
 -(void) sendkeepalive:(NSTimer*)t
 {
-    // check if we are sending? FIXME
-    NSLog(@"Keepalive");
+    //NSLog(@"Keepalive");
     [self identifyclient];
 }
 
