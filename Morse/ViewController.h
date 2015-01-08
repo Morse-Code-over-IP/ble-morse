@@ -19,6 +19,8 @@
 #define MAXDATASIZE 1024 // max number of bytes we can get at once
 #define LATCHED 0
 #define UNLATCHED 1
+#define CONNECTED 0
+#define DISCONNECTED 1
 
 @interface ViewController : UIViewController
 {
@@ -59,11 +61,16 @@
     long tx_timeout;
     
     int circuit;
+    int connect;
 }
 
 
+@property (weak, nonatomic) IBOutlet UISwitch *sw_connect;
+@property (weak, nonatomic) IBOutlet UISwitch *sw_circuit;
+@property (weak, nonatomic) IBOutlet UITextField *enter_id;
+
+
 @property (weak, nonatomic) IBOutlet UIButton *mybutton;
-@property (weak, nonatomic) IBOutlet UIButton *btn_circuit;
 
 @property (weak, nonatomic) IBOutlet UILabel *txt1;
 @property (weak, nonatomic) IBOutlet UILabel *txt_server;
@@ -71,6 +78,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *txt_channel;
 @property (weak, nonatomic) IBOutlet UILabel *txt_id;
 @property (weak, nonatomic) IBOutlet UIWebView *webview;
+
 
 @property (weak, nonatomic) IBOutlet UIImageView *img;
 @property (weak, nonatomic) IBOutlet UIImageView *img2;

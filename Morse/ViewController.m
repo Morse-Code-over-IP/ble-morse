@@ -85,11 +85,12 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize txt_id;
 @synthesize webview;
 
+@synthesize sw_connect, sw_circuit;
+@synthesize enter_id;
 
 @synthesize img;
 @synthesize img2;
 @synthesize mybutton;
-@synthesize btn_circuit;
 
 // connect to server and send my id.
 - (void)
@@ -110,7 +111,13 @@ identifyclient
 {
     char hostname[64] = "mtc-kob.dyndns.org"; // FIXME - make global
     char port1[16] = "7890";
-    char id[SIZE_ID] = "iOS/DG6FL, intl. Morse"; // FIXME - make global
+    
+    //enter_id.text;
+    
+
+    char *id = [enter_id.text UTF8String]; // = ;//"iOS/DG6FL, intl. Morse"; // FIXME - make global
+    //[enter_id.text getBytes:&id length:SIZE_ID];
+    
     int channel = 33;
     
     prepare_id (&id_packet, id);
@@ -119,7 +126,7 @@ identifyclient
     
     txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port1];
     txt_channel.text = [NSString stringWithFormat:@"ch: %d", channel];
-    txt_id.text = [NSString stringWithFormat:@"id: %s", id];
+    //txt_id.text = [NSString stringWithFormat:@"id: %s", id];
    
     udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     
@@ -134,11 +141,17 @@ identifyclient
         NSLog(@"error");
         return;
     }
+   
+    
     [self identifyclient];
+    
+             myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
 }
 
 - (void)disconnectMorse
 {
+    [myTimer invalidate];
+    txt_server.text = @"NONE";
 }
 
 - (void)createToneUnit
@@ -232,6 +245,7 @@ identifyclient
     tx_timeout = 0;
     last_message = 0;
     circuit = LATCHED;
+    connect = DISCONNECTED;
     
     host = @"mtc-kob.dyndns.org";
     port = 7890;
@@ -252,10 +266,24 @@ identifyclient
     }
 }
 
+-(void) switchconnect
+{
+    if (connect == CONNECTED)
+    {
+        connect = DISCONNECTED;
+        [self disconnectMorse];
+    }
+    else
+    {
+        connect = CONNECTED;
+        [self connectMorse];
+    }
+}
+
 - (void)viewDidLoad {
     // Image Stuff
     UIImage *image1 = [UIImage imageNamed:@"one.png"];
-    UIImage *image2 = [UIImage imageNamed:@"key.jpg"];
+    UIImage *image2 = [UIImage imageNamed:@"key.png"];
     [img setImage:image1];
     [img2 setImage:image2];
     
@@ -282,17 +310,29 @@ identifyclient
     [self.view addGestureRecognizer:tapr];
     */
     
+    // Key text button
     [mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
     [mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
+    [mybutton setBackgroundImage:image2 forState:UIControlStateNormal];
     
-    [btn_circuit addTarget:self action:@selector(switchcircuit) forControlEvents:UIControlEventTouchDown];
-    
+    // (Un-)Latch text button
+    //[btn_circuit addTarget:self action:@selector(switchcircuit) forControlEvents:UIControlEventTouchDown];
+    [sw_circuit addTarget:self action:@selector(switchcircuit) forControlEvents:UIControlEventValueChanged];
+
+    // Connect to server
+    [sw_connect addTarget:self action:@selector(switchconnect) forControlEvents:UIControlEventValueChanged];
+    [sw_connect setOn:false];
+    // initialize vars
     [self initCWvars];
-    [self connectMorse];
+    //[self connectMorse];
     
+    // init id selector
+    enter_id.text = @"iOS/DG6FL, intl. Morse";
+    
+    // init tone
     frequency = 800;
     [self beep]; // hack: must be run once for initialization
-    usleep(100*1000);
+    usleep(100*1000); //fixme
     AudioOutputUnitStop(toneUnit);
     
     // Display web stuff
@@ -301,11 +341,10 @@ identifyclient
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webview loadRequest:requestObj];
 
-    myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
+    //myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
     
     // does not work yet [self play_clack];
 }
-
 
 - (void) message:(int) msg
 {
