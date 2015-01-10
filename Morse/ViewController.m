@@ -663,7 +663,7 @@ fastclock(void)
     }
 */
     [self send_data];
-    [self send_tx_packet]; // FIXME: why run the code below, if we can send right now?
+    //[self send_tx_packet]; // FIXME: why run the code below, if we can send right now?
 }
 
 
@@ -672,6 +672,7 @@ fastclock(void)
 #ifdef DEBUG_TX
     NSLog(@"Send udp data");
 #endif
+    if (connect == DISCONNECTED) return; // do not continue when disconnected
     //if (tx_data_packet.code[0]>0) return; // assert first pause
 
     //if(tx_data_packet.n == 2 ) {NSLog(@"tx_data.n eq 2");return;} // assert only two packages // FIXME??
