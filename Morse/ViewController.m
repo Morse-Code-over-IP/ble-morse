@@ -330,6 +330,17 @@ identifyclient
         UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
         AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory), &sessionCategory);
     }
+    
+    // set the buffer duration to 5 ms
+    // set preferred buffer size
+    Float32 preferredBufferSize = 5./1000.; // in seconds
+    result = AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration, sizeof(preferredBufferSize), &preferredBufferSize);
+    
+    // get actuall buffer size
+    Float32 audioBufferSize;
+    UInt32 size = sizeof (audioBufferSize);
+    result = AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareIOBufferDuration, &size, &audioBufferSize);
+    
     AudioSessionSetActive(true);
 #pragma GCC diagnostic pop
 
