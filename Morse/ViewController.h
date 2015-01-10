@@ -67,9 +67,7 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *sw_connect;
 @property (weak, nonatomic) IBOutlet UISwitch *sw_circuit;
-@property (weak, nonatomic) IBOutlet UITextField *enter_id;
-@property (weak, nonatomic) IBOutlet UIPickerView *pick_channel;
-
+@property (strong, nonatomic) IBOutlet UITextField *enter_id;
 
 @property (weak, nonatomic) IBOutlet UIButton *mybutton;
 

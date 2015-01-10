@@ -83,7 +83,6 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 
 @synthesize webview;
 
-@synthesize pick_channel;
 @synthesize sw_connect, sw_circuit;
 @synthesize enter_id;
 @synthesize mybutton;
@@ -255,8 +254,30 @@ identifyclient
     port = 7890;
 
     // init id selector
-    enter_id.text = @"iOS/DG6FL, intl. Morse";
+    enter_id.placeholder = @"iOS/DG6FL, intl. Morse";
 }
+
+// This method is called once we click inside the textField
+-(void)textFieldDidBeginEditing:(UITextField *)enter_id{
+#ifdef DEBUG
+    NSLog(@"Text field did begin editing");
+#endif
+}
+
+// This method is called once we complete editing
+-(void)textFieldDidEndEditing:(UITextField *)enter_id{
+#ifdef DEBUG
+    NSLog(@"Text field ended editing");
+#endif
+}
+
+// This method enables or disables the processing of return key
+-(BOOL) textFieldShouldReturn:(UITextField *)enter_id{
+    [enter_id resignFirstResponder];
+    return YES;
+}
+
+
 
 - (void)switchcircuit
 {
@@ -317,14 +338,19 @@ identifyclient
     // initialize vars
     [self initCWvars];
     [self inittone];
+    [self displaywebstuff];
     
-    // Display web stuff
+    // does not work yet [self play_clack];
+    enter_id.delegate = self;
+}
+
+
+-(void)displaywebstuff
+{
     NSString *urlAddress = @"http://mtc-kob.dyndns.org";
     NSURL *url = [NSURL URLWithString:urlAddress];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webview loadRequest:requestObj];
-    
-    // does not work yet [self play_clack];
 }
 
 - (void) message:(int) msg
@@ -583,7 +609,7 @@ fastclock(void)
 {
     NSLog(@"latch");
 
-    tx_sequence++;
+    tx_sequence++; // FIXME: This is a special packet an can go into networking.
     tx_data_packet.sequence = tx_sequence;
     tx_data_packet.code[0] = -1;
     tx_data_packet.code[1] = 1;
@@ -614,7 +640,9 @@ fastclock(void)
 
 -(void) sendkeepalive:(NSTimer*)t
 {
-    //NSLog(@"Keepalive");
+#ifdef DEBUG_NET
+    NSLog(@"Keepalive");
+#endif
     [self identifyclient];
 }
 
