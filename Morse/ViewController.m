@@ -356,9 +356,11 @@ identifyclient
     enter_id.delegate = self;
     enter_channel.delegate = self;
 
+#ifdef SCROLLVIEWLOG
     scr_view.editable = false;
     scr_view.text = @" ";
     scr_view.scrollEnabled = true;
+#endif
 }
 
 
@@ -397,7 +399,9 @@ identifyclient
         default:
             break;
     }
-    //scr_view.text = [txt_status.text stringByAppendingString:scr_view.text];
+#ifdef SCROLLVIEWLOG
+    scr_view.text = [txt_status.text stringByAppendingString:scr_view.text];
+#endif
 }
 
 
