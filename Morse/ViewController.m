@@ -344,6 +344,8 @@ identifyclient
     //myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
     
     // does not work yet [self play_clack];
+    
+
 }
 
 - (void) message:(int) msg
@@ -504,6 +506,21 @@ withFilterContext:(id)filterContext
     
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    if ([self canBecomeFirstResponder]) {
+        [self becomeFirstResponder];
+    }
+    //[mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
+    //[mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+    [self resignFirstResponder];
+}
 
 -(void)tapresp:(UITapGestureRecognizer *)sender{
     NSLog(@"tapped");
@@ -638,6 +655,87 @@ fastclock(void)
 {
     //NSLog(@"Keepalive");
     [self identifyclient];
+}
+
+-(void) calli
+{
+    NSLog(@"Calli");
+}
+
+
+ // TODO: Bluetooth serial support? http://www.adafruit.com/products/1697
+
+/*
+ 1(Tip) - Key (Masse)
+ 2 - Ear (Kontakt)
+ 3 - Ear (Masse)
+ 4(Masse) - R2(46,6k ge-br?-sw-rt-br) - Key 1
+ 4(Masse) - R3(22k br-rt-sw-rt-rt) - Key 2
+ 4(Masse) - R1(1k br-sw-sw-br-br) - 3
+ 
+ (1) left earphone (tip), (2) right earphone (ring), (3) com- mon/ground (ring), and (4) microphone (sleeve)
+ 
+ 
+ https://web.eecs.umich.edu/~prabal/pubs/papers/kuo10hijack.pdf
+ 
+ 
+ ton auf kanal -> empfange lautstärke -> an / aus
+ */
+
+- (void)remoteControlReceivedWithEvent:(UIEvent *)theEvent
+{
+    //[mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
+    //[mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
+    // internals: https://de.ifixit.com/Teardown/Apple+EarPods+Teardown/10501
+    //
+    //NSLog(@"okese on");
+
+    //AudioSessionAddPropertyListener( kAudioSessionProperty_CurrentHardwareOutputVolume , audioVolumeChangeListenerCallback, self );
+
+
+    // alternativ: core event internal apple: https://code.google.com/p/cocotron/source/browse/UIKit/UIEvent.h?spec=svn4a2ea12165b6894ccf7bc85a5891bc8e36e156cd&r=4a2ea12165b6894ccf7bc85a5891bc8e36e156cd
+    // https://github.com/nst/iOS-Runtime-Headers 
+    
+    if (theEvent.type == UIEventTypeRemoteControl)
+    {
+        switch(theEvent.subtype) {
+            case UIEventSubtypeRemoteControlTogglePlayPause:
+                //Insert code
+                NSLog(@"ok / off");
+                
+            case UIEventSubtypeRemoteControlPlay:
+                //Insert code
+                NSLog(@"play");
+
+                break;
+            case UIEventSubtypeRemoteControlPause:
+                // Insert code
+                 NSLog(@"pause");
+                break;
+            case UIEventSubtypeRemoteControlStop:
+                //Insert code.
+                 NSLog(@"stop");
+                break;
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                NSLog(@"prev");
+                //[self rewButtonReleased:(UIButton *)rewButton];
+                break;
+            case UIEventSubtypeRemoteControlNextTrack:
+                
+                NSLog(@"next");
+            //    [self ffwButtonReleased:(UIButton *)ffwButton];
+                break; //- See more at: http://sugarrushva.my03.com/577444-remotecontrolreceivedwithevent-in-avaudio-is-not-being-called.html#sthash.SxHL7jEr.dpuf
+            case UIEventSubtypeRemoteControlBeginSeekingForward:
+                NSLog(@"begin fast forward");
+                break;
+            case UIEventSubtypeRemoteControlEndSeekingForward:
+                NSLog(@"end fast forward");
+                break;
+            default:
+                 NSLog(@"other");
+                return;
+        }
+    }
 }
 
 @end
