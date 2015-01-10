@@ -230,6 +230,7 @@ identifyclient
 
 - (void)beep:(double)duration_ms
 {
+    if (!toneUnit) [self inittone];
     OSErr err = AudioOutputUnitStart(toneUnit);
     NSAssert1(err == noErr, @"Error starting unit: %hd", err);
     usleep(abs(duration_ms)*1000.);
