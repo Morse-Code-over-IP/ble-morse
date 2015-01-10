@@ -79,17 +79,13 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @end
 
 @implementation ViewController
-@synthesize txt1;
-@synthesize txt_server;
-@synthesize txt_status;
-@synthesize txt_channel;
-@synthesize txt_id;
+@synthesize txt_server, txt_status, txt_channel, txt_id;
+
 @synthesize webview;
 
+@synthesize pick_channel;
 @synthesize sw_connect, sw_circuit;
 @synthesize enter_id;
-
-@synthesize img2;
 @synthesize mybutton;
 
 // connect to server and send my id.
@@ -291,7 +287,7 @@ identifyclient
     NSLog(@"Load View");
     // Image Stuff
     UIImage *image2 = [UIImage imageNamed:@"key.png"];
-    [img2 setImage:image2];
+    //[img2 setImage:image2];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.

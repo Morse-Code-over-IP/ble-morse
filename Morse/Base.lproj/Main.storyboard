@@ -121,13 +121,30 @@
                                     <rect key="frame" x="16" y="130" width="296" height="145"/>
                                 </variation>
                             </button>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Reh-V3-mOo">
+                                <rect key="frame" x="0.0" y="-162" width="320" height="162"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="114" y="390" width="193" height="162"/>
+                                </variation>
+                            </pickerView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="Reh-V3-mOo"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="Reh-V3-mOo"/>
+                            </mask>
+                        </variation>
                     </view>
                     <connections>
                         <outlet property="enter_id" destination="bjt-pN-P0J" id="c5j-dY-hlD"/>
                         <outlet property="mybutton" destination="7sn-iI-3Y1" id="Szm-Ui-O31"/>
+                        <outlet property="pick_channel" destination="Reh-V3-mOo" id="1rz-Bl-Afq"/>
                         <outlet property="sw_circuit" destination="FLQ-1h-e8x" id="abl-ho-t8x"/>
                         <outlet property="sw_connect" destination="NNS-t8-0xb" id="I7B-ut-jMm"/>
                         <outlet property="txt_channel" destination="TdE-Kw-d98" id="yFc-e4-FqV"/>

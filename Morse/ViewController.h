@@ -68,19 +68,16 @@
 @property (weak, nonatomic) IBOutlet UISwitch *sw_connect;
 @property (weak, nonatomic) IBOutlet UISwitch *sw_circuit;
 @property (weak, nonatomic) IBOutlet UITextField *enter_id;
+@property (weak, nonatomic) IBOutlet UIPickerView *pick_channel;
 
 
 @property (weak, nonatomic) IBOutlet UIButton *mybutton;
 
-@property (weak, nonatomic) IBOutlet UILabel *txt1;
 @property (weak, nonatomic) IBOutlet UILabel *txt_server;
 @property (weak, nonatomic) IBOutlet UILabel *txt_status;
 @property (weak, nonatomic) IBOutlet UILabel *txt_channel;
 @property (weak, nonatomic) IBOutlet UILabel *txt_id;
 @property (weak, nonatomic) IBOutlet UIWebView *webview;
-
-
-@property (weak, nonatomic) IBOutlet UIImageView *img2;
 
 - (void)beep:(double)duration_ms;
 - (void)stop;
