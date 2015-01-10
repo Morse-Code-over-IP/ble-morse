@@ -83,7 +83,7 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize txt_server, txt_status, txt_channel, txt_id;
 @synthesize scr_view;
 @synthesize webview;
-@synthesize sw_connect, sw_circuit;
+@synthesize sw_connect, sw_circuit, sw_sounder;
 @synthesize enter_id, enter_channel;
 @synthesize mybutton;
 
@@ -238,10 +238,20 @@ identifyclient
 - (void)beep:(double)duration_ms
 {
     if (!toneUnit) [self inittone];
-    OSErr err = AudioOutputUnitStart(toneUnit);
-    NSAssert1(err == noErr, @"Error starting unit: %hd", err);
-    usleep(abs(duration_ms)*1000.);
-    AudioOutputUnitStop(toneUnit);
+
+    if (sounder == true)
+    {
+        [self play_click];
+        usleep(abs(duration_ms)*1000.);
+        [self play_clack];
+    }
+    else
+    {
+        OSErr err = AudioOutputUnitStart(toneUnit);
+        NSAssert1(err == noErr, @"Error starting unit: %hd", err);
+        usleep(abs(duration_ms)*1000.);
+        AudioOutputUnitStop(toneUnit);
+    }
 }
 
 - (void)initCWvars
@@ -264,6 +274,8 @@ identifyclient
     // init id selector
     enter_id.placeholder = @"iOS/DG6FL, intl. Morse";
     enter_channel.placeholder = @"33";
+    
+    sounder = false;
 }
 
 // This method is called once we click inside the textField
@@ -313,6 +325,19 @@ identifyclient
     }
 }
 
+-(void) switchsounder
+{
+    NSLog(@"switch sounder");
+    if (sounder == true)
+    {
+        sounder = false;
+    }
+    else
+    {
+        sounder = true;
+    }
+}
+
 - (void)viewDidLoad {
     NSLog(@"Load View");
     // Image Stuff
@@ -355,6 +380,10 @@ identifyclient
     // Connect to server switch
     [sw_connect addTarget:self action:@selector(switchconnect) forControlEvents:UIControlEventValueChanged];
     [sw_connect setOn:false];
+    
+    // sounder switch
+    [sw_sounder addTarget:self action:@selector(switchsounder) forControlEvents:UIControlEventValueChanged];
+    [sw_sounder setOn:false];
     
     // initialize vars
     [self initCWvars];
@@ -448,13 +477,18 @@ identifyclient
 - (void)play_clack
 {
     NSLog(@"play clack");
-    [self playSoundFXnamed:@"clack48.wav" Loop: NO];
-#ifdef okok
     SystemSoundID completeSound;
-    NSURL *audioPath = [[NSBundle mainBundle] URLForResource:@"clack48.wav" withExtension:@"wav"];
+    NSURL *audioPath = [[NSBundle mainBundle] URLForResource:@"clack48" withExtension:@"wav"];
     AudioServicesCreateSystemSoundID((__bridge CFURLRef)audioPath, &completeSound);
     AudioServicesPlaySystemSound (completeSound);
-#endif
+}
+- (void)play_click
+{
+    NSLog(@"play click");
+    SystemSoundID completeSound;
+    NSURL *audioPath = [[NSBundle mainBundle] URLForResource:@"click48" withExtension:@"wav"];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)audioPath, &completeSound);
+    AudioServicesPlaySystemSound (completeSound);
 }
 
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
@@ -563,9 +597,13 @@ fastclock(void)
 
 -(void)buttonIsDown
 {
-    AudioOutputUnitStart(toneUnit);
-    
     key_press_t1 = fastclock();
+
+    if (sounder == true)
+        [self play_click];
+    else
+        AudioOutputUnitStart(toneUnit);
+    
     tx_timeout = 0;
     int timing = (int) ((key_press_t1 - key_release_t1) * -1); // negative timing
     if (timing > TX_WAIT) timing = TX_WAIT; // limit to timeout
@@ -579,8 +617,12 @@ fastclock(void)
 
 -(void)buttonWasReleased
 {
-    AudioOutputUnitStop(toneUnit);
     key_release_t1 = fastclock();
+    if (sounder == true)
+        [self play_clack];
+    else
+        AudioOutputUnitStop(toneUnit);
+
     
     int timing =(int) ((key_release_t1 - key_press_t1) * 1); // positive timing
     if (abs(timing) > TX_WAIT) timing = -TX_WAIT; // limit to timeout FIXME this is the negative part
@@ -655,6 +697,8 @@ fastclock(void)
     
     tx_data_packet.n = 0;
     circuit = LATCHED;
+    [self play_click];
+
 #ifdef NOTIFICATIONS //TODO not implemented yet
     //[ postNotification:@"Hello World"];
 #endif
@@ -676,6 +720,7 @@ fastclock(void)
     tx_data_packet.n = 0;
     
     circuit = UNLATCHED;
+    [self play_clack];
 }
 
 -(void) sendkeepalive:(NSTimer*)t

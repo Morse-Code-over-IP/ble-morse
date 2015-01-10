@@ -63,11 +63,13 @@
     
     int circuit;
     int connect;
+    BOOL sounder;
 }
-
 
 @property (weak, nonatomic) IBOutlet UISwitch *sw_connect;
 @property (weak, nonatomic) IBOutlet UISwitch *sw_circuit;
+@property (weak, nonatomic) IBOutlet UISwitch *sw_sounder;
+
 @property (strong, nonatomic) IBOutlet UITextField *enter_id;
 @property (strong, nonatomic) IBOutlet UITextField *enter_channel;
 
