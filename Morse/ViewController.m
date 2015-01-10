@@ -84,7 +84,7 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize webview;
 
 @synthesize sw_connect, sw_circuit;
-@synthesize enter_id;
+@synthesize enter_id, enter_channel;
 @synthesize mybutton;
 
 // connect to server and send my id.
@@ -109,14 +109,14 @@ identifyclient
     char port1[16] = "7890";
     
     char *id = (char *)[enter_id.text UTF8String]; // = ;//"iOS/DG6FL, intl. Morse"; // FIXME - make global
-    int channel = 33;
+    int channel = atoi([enter_channel.text UTF8String]); //33;
     
     prepare_id (&id_packet, id);
     prepare_tx (&tx_data_packet, id);
     connect_packet.channel = channel;
     
     txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port1];
-    txt_channel.text = [NSString stringWithFormat:@"ch: %d", channel];
+    //txt_channel.text = [NSString stringWithFormat:@"ch: %d", channel];
    
     udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     
@@ -255,29 +255,28 @@ identifyclient
 
     // init id selector
     enter_id.placeholder = @"iOS/DG6FL, intl. Morse";
+    enter_channel.placeholder = @"33";
 }
 
 // This method is called once we click inside the textField
--(void)textFieldDidBeginEditing:(UITextField *)enter_id{
+-(void)textFieldDidBeginEditing:(UITextField *)ff{
 #ifdef DEBUG
     NSLog(@"Text field did begin editing");
 #endif
 }
 
 // This method is called once we complete editing
--(void)textFieldDidEndEditing:(UITextField *)enter_id{
+-(void)textFieldDidEndEditing:(UITextField *)ff{
 #ifdef DEBUG
     NSLog(@"Text field ended editing");
 #endif
 }
 
 // This method enables or disables the processing of return key
--(BOOL) textFieldShouldReturn:(UITextField *)enter_id{
-    [enter_id resignFirstResponder];
+-(BOOL) textFieldShouldReturn:(UITextField *)ff{
+    [ff resignFirstResponder];
     return YES;
 }
-
-
 
 - (void)switchcircuit
 {
@@ -342,6 +341,8 @@ identifyclient
     
     // does not work yet [self play_clack];
     enter_id.delegate = self;
+    enter_channel.delegate = self;
+
 }
 
 
