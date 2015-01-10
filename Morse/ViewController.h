@@ -80,6 +80,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *txt_status;
 @property (weak, nonatomic) IBOutlet UILabel *txt_channel;
 @property (weak, nonatomic) IBOutlet UILabel *txt_id;
+@property (weak, nonatomic) IBOutlet UILabel *txt_version;
+
 @property (weak, nonatomic) IBOutlet UIWebView *webview;
 
 - (void)beep:(double)duration_ms;

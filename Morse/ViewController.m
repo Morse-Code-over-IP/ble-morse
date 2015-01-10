@@ -24,6 +24,7 @@
 //#define DEBUG_NET
 //#define DEBUG_TX
 //#define EXT_KEY
+#define SCROLLVIEWLOG
 
 OSStatus RenderTone(
                     void *inRefCon,
@@ -80,7 +81,8 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @end
 
 @implementation ViewController
-@synthesize txt_server, txt_status, txt_channel, txt_id;
+@synthesize txt_server, txt_status, txt_channel, txt_id, txt_version
+;
 @synthesize scr_view;
 @synthesize webview;
 @synthesize sw_connect, sw_circuit, sw_sounder;
@@ -401,6 +403,10 @@ identifyclient
     scr_view.text = @" ";
     scr_view.scrollEnabled = true;
 #endif
+    NSString * appVersionString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString * appBuildString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+
+    txt_version.text = [NSString stringWithFormat:@"Version: %@ (%@)", appVersionString, appBuildString];
 }
 
 
@@ -649,6 +655,7 @@ fastclock(void)
     }
 */
     [self send_data];
+    [self send_tx_packet]; // FIXME: why run the code below, if we can send right now?
 }
 
 
