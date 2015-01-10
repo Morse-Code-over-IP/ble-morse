@@ -80,17 +80,15 @@
 @property (weak, nonatomic) IBOutlet UIWebView *webview;
 
 
-@property (weak, nonatomic) IBOutlet UIImageView *img;
 @property (weak, nonatomic) IBOutlet UIImageView *img2;
 
-- (void)beep;
+- (void)beep:(double)duration_ms;
 - (void)stop;
 - (void)connectMorse;
 - (void)disconnectMorse;
 - (void)message:(int)msg;
 - (void)identifyclient;
 - (void)initCWvars;
-- (void)tapresp:(UITapGestureRecognizer *)sender; // TBD may away :)
 
 @end
 

@@ -21,7 +21,8 @@
 
 
 //#undef DEBUG
-#define TX
+//#define DEBUG_NET
+//#define DEBUG_TX
 
 OSStatus RenderTone(
                     void *inRefCon,
@@ -88,7 +89,6 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize sw_connect, sw_circuit;
 @synthesize enter_id;
 
-@synthesize img;
 @synthesize img2;
 @synthesize mybutton;
 
@@ -109,15 +109,11 @@ identifyclient
 
 - (void)connectMorse
 {
+    NSLog(@"Connect to server");
     char hostname[64] = "mtc-kob.dyndns.org"; // FIXME - make global
     char port1[16] = "7890";
     
-    //enter_id.text;
-    
-
-    char *id = [enter_id.text UTF8String]; // = ;//"iOS/DG6FL, intl. Morse"; // FIXME - make global
-    //[enter_id.text getBytes:&id length:SIZE_ID];
-    
+    char *id = (char *)[enter_id.text UTF8String]; // = ;//"iOS/DG6FL, intl. Morse"; // FIXME - make global
     int channel = 33;
     
     prepare_id (&id_packet, id);
@@ -126,7 +122,6 @@ identifyclient
     
     txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port1];
     txt_channel.text = [NSString stringWithFormat:@"ch: %d", channel];
-    //txt_id.text = [NSString stringWithFormat:@"id: %s", id];
    
     udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     
@@ -141,21 +136,24 @@ identifyclient
         NSLog(@"error");
         return;
     }
-   
     
     [self identifyclient];
     
-             myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
+    // Start Keepalive timer
+    myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
 }
 
 - (void)disconnectMorse
 {
+    NSLog(@"Disconnect from server");
+    // Stop keepalive timer
     [myTimer invalidate];
     txt_server.text = @"NONE";
 }
 
 - (void)createToneUnit
 {
+    NSLog(@"Create tone Unit");
     // Configure the search parameters to find the default playback output unit
     // (called the kAudioUnitSubType_RemoteIO on iOS but
     // kAudioUnitSubType_DefaultOutput on Mac OS X)
@@ -208,34 +206,41 @@ identifyclient
     NSAssert1(err == noErr, @"Error setting stream format: %hd", err);
 }
 
-- (void)beep
+- (void)inittone
 {
-    if (toneUnit)
-    {
-        AudioOutputUnitStop(toneUnit);
-        AudioUnitUninitialize(toneUnit);
-        AudioComponentInstanceDispose(toneUnit);
-        toneUnit = nil;
-        
-    }
-    else
-    {
-        [self createToneUnit];
-        
-        // Stop changing parameters on the unit
-        OSErr err = AudioUnitInitialize(toneUnit);
-        NSAssert1(err == noErr, @"Error initializing unit: %hd", err);
-        
-        // Start playback
-        err = AudioOutputUnitStart(toneUnit);
-        NSAssert1(err == noErr, @"Error starting unit: %hd", err);
-       
-    }
+    NSLog(@"Starting tone Unit");
+
+    sampleRate = 44100;
+    frequency = 800;
+
+    [self createToneUnit];
     
+    // Stop changing parameters on the unit
+    OSErr err = AudioUnitInitialize(toneUnit);
+    NSAssert1(err == noErr, @"Error initializing unit: %hd", err); // FIXME: we can use this for other quality stuff
+}
+
+- (void)stoptone
+{
+    NSLog(@"Stopping tone Unit");
+    if (!toneUnit) return;
+    AudioOutputUnitStop(toneUnit);
+    AudioUnitUninitialize(toneUnit);
+    AudioComponentInstanceDispose(toneUnit);
+    toneUnit = nil;
+}
+
+- (void)beep:(double)duration_ms
+{
+    OSErr err = AudioOutputUnitStart(toneUnit);
+    NSAssert1(err == noErr, @"Error starting unit: %hd", err);
+    usleep(abs(duration_ms)*1000.);
+    AudioOutputUnitStop(toneUnit);
 }
 
 - (void)initCWvars
 {
+    NSLog(@"Init CW Vars");
     connect_packet.channel = DEFAULT_CHANNEL;
     connect_packet.command = CON;
     disconnect_packet.channel = 0;
@@ -250,6 +255,8 @@ identifyclient
     host = @"mtc-kob.dyndns.org";
     port = 7890;
 
+    // init id selector
+    enter_id.text = @"iOS/DG6FL, intl. Morse";
 }
 
 - (void)switchcircuit
@@ -281,19 +288,16 @@ identifyclient
 }
 
 - (void)viewDidLoad {
+    NSLog(@"Load View");
     // Image Stuff
-    UIImage *image1 = [UIImage imageNamed:@"one.png"];
     UIImage *image2 = [UIImage imageNamed:@"key.png"];
-    [img setImage:image1];
     [img2 setImage:image2];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    // Audi stuff
-    sampleRate = 44100;
-
-    //BOOL activated = [[AVAudioSession sharedInstance] setActive:YES error:&error];
+#pragma GCC diagnostic push // I know that this does not work!
+#pragma GCC diagnostic ignored "-Wdeprecated"
     OSStatus result = AudioSessionInitialize(NULL, NULL, ToneInterruptionListener, (__bridge void *)(self));
     if (result == kAudioSessionNoError)
     {
@@ -301,51 +305,31 @@ identifyclient
         AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory), &sessionCategory);
     }
     AudioSessionSetActive(true);
-    
-    // Tap recog
-    
-   /* UITapGestureRecognizer * tapr = [[ UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapresp:)];
-    tapr.numberOfTapsRequired  = 1;
-    tapr.numberOfTouchesRequired = 1;
-    [self.view addGestureRecognizer:tapr];
-    */
-    
+#pragma GCC diagnostic pop
+
     // Key text button
     [mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
     [mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
     [mybutton setBackgroundImage:image2 forState:UIControlStateNormal];
     
-    // (Un-)Latch text button
-    //[btn_circuit addTarget:self action:@selector(switchcircuit) forControlEvents:UIControlEventTouchDown];
+    // (Un-)Latch text switch
     [sw_circuit addTarget:self action:@selector(switchcircuit) forControlEvents:UIControlEventValueChanged];
 
-    // Connect to server
+    // Connect to server switch
     [sw_connect addTarget:self action:@selector(switchconnect) forControlEvents:UIControlEventValueChanged];
     [sw_connect setOn:false];
+    
     // initialize vars
     [self initCWvars];
-    //[self connectMorse];
-    
-    // init id selector
-    enter_id.text = @"iOS/DG6FL, intl. Morse";
-    
-    // init tone
-    frequency = 800;
-    [self beep]; // hack: must be run once for initialization
-    usleep(100*1000); //fixme
-    AudioOutputUnitStop(toneUnit);
+    [self inittone];
     
     // Display web stuff
     NSString *urlAddress = @"http://mtc-kob.dyndns.org";
     NSURL *url = [NSURL URLWithString:urlAddress];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webview loadRequest:requestObj];
-
-    //myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
     
     // does not work yet [self play_clack];
-    
-
 }
 
 - (void) message:(int) msg
@@ -428,14 +412,14 @@ withFilterContext:(id)filterContext
     int audio_status = 1;
     
     [data getBytes:&rx_data_packet length:sizeof(rx_data_packet)];
-#ifdef DEBUG1
-        NSLog(@"length: %i\n", rx_data_packet.length);
-        NSLog(@"id: %s\n", rx_data_packet.id);
-        NSLog(@"sequence no.: %i\n", rx_data_packet.sequence);
-        NSLog(@"version: %s\n", rx_data_packet.status);
-        NSLog(@"n: %i\n", rx_data_packet.n);
-        NSLog(@"code:\n");
-        for(i = 0; i < SIZE_CODE; i++)NSLog(@"%i ", rx_data_packet.code[i]); NSLog(@"\n");
+#ifdef DEBUG_NET
+    NSLog(@"length: %i\n", rx_data_packet.length);
+    NSLog(@"id: %s\n", rx_data_packet.id);
+    NSLog(@"sequence no.: %i\n", rx_data_packet.sequence);
+    NSLog(@"version: %s\n", rx_data_packet.status);
+    NSLog(@"n: %i\n", rx_data_packet.n);
+    NSLog(@"code:\n");
+    for(i = 0; i < SIZE_CODE; i++)NSLog(@"%i ", rx_data_packet.code[i]); NSLog(@"\n");
 #endif
     txt_status.text = [NSString stringWithFormat:@"recv from: %s", rx_data_packet.id];
         if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
@@ -456,20 +440,16 @@ withFilterContext:(id)filterContext
                         if(audio_status == 1)
                         {
                             int length = rx_data_packet.code[i];
-                            if(length == 0 || abs(length) > 2000) {
+                            if(length == 0 || abs(length) > 2000) { // FIXME: magic number
                             }
                             else
                             {
                                 if(length < 0) {
-                                    AudioOutputUnitStop(toneUnit);
-                                    usleep(abs(length)*1000.);
-                                    AudioOutputUnitStop(toneUnit);
+                                    usleep(abs(length)*1000.); // pause
                                 }
                                 else
                                 {
-                                    AudioOutputUnitStart(toneUnit);
-                                    usleep(abs(length)*1000.);
-                                    AudioOutputUnitStop(toneUnit);
+                                    [self beep:(abs(length))];
                                 }
                             }
                         }
@@ -477,10 +457,6 @@ withFilterContext:(id)filterContext
                 }
             }
         }
-    
-
-
-
 }
 
 
@@ -492,12 +468,7 @@ withFilterContext:(id)filterContext
 - (void)stop
 {
     [self disconnectMorse];
-    
-    if (toneUnit)
-    {
-        // Stop sound
-
-    }
+    [self stoptone];
 }
 
 - (void)viewDidUnload {
@@ -507,26 +478,12 @@ withFilterContext:(id)filterContext
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-    if ([self canBecomeFirstResponder]) {
-        [self becomeFirstResponder];
-    }
-    //[mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
-    //[mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    [super viewWillDisappear:animated];
-    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
-    [self resignFirstResponder];
 }
 
--(void)tapresp:(UITapGestureRecognizer *)sender{
-    NSLog(@"tapped");
-    AudioOutputUnitStop(toneUnit);
- 
-}
 /* portable time, as listed in https://gist.github.com/jbenet/1087739  */
 void current_utc_time(struct timespec *ts) {
     clock_serv_t cclock;
@@ -560,7 +517,9 @@ fastclock(void)
     if (timing > TX_WAIT) timing = TX_WAIT; // limit to timeout
     tx_data_packet.n++;
     tx_data_packet.code[tx_data_packet.n - 1] = timing;
-    //NSLog(@"timing: %d", timing);
+#ifdef DEBUG_TX
+    NSLog(@"timing: %d", timing);
+#endif
     [self message:1];
 }
 
@@ -574,7 +533,9 @@ fastclock(void)
     if (tx_data_packet.n == SIZE_CODE) NSLog(@"warning: packet is full");
     tx_data_packet.n++;
     tx_data_packet.code[tx_data_packet.n - 1] = timing;
-    //NSLog(@"timing: %d", timing);
+#ifdef DEBUG_TX
+    NSLog(@"timing: %d", timing);
+#endif
 
     
     //NSLog(@"mark: %i\n", tx_data_packet.code[tx_data_packet.n -1]);
@@ -597,17 +558,18 @@ fastclock(void)
 
 -(void) send_data
 {
-
+#ifdef DEBUG_TX
+    NSLog(@"Send udp data");
+#endif
     //if (tx_data_packet.code[0]>0) return; // assert first pause
-    
-    if(tx_data_packet.n == 2 ) return; // assert only two packages
+
+    if(tx_data_packet.n == 2 ) return; // assert only two packages // FIXME??
     
     tx_sequence++;
     tx_data_packet.sequence = tx_sequence;
 
     [self send_tx_packet];
     tx_data_packet.n = 0;
-
 }
 
 - (void) send_tx_packet
@@ -615,7 +577,7 @@ fastclock(void)
     int i;
     NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
     for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
-#if DEBUG
+#ifdef DEBUG_NET
     NSLog(@"sent seq %d n %d (%d,%d).", tx_sequence, tx_data_packet.n,
           tx_data_packet.code[0] ,
           tx_data_packet.code[1]
@@ -682,60 +644,5 @@ fastclock(void)
  ton auf kanal -> empfange lautstärke -> an / aus
  */
 
-- (void)remoteControlReceivedWithEvent:(UIEvent *)theEvent
-{
-    //[mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
-    //[mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
-    // internals: https://de.ifixit.com/Teardown/Apple+EarPods+Teardown/10501
-    //
-    //NSLog(@"okese on");
-
-    //AudioSessionAddPropertyListener( kAudioSessionProperty_CurrentHardwareOutputVolume , audioVolumeChangeListenerCallback, self );
-
-
-    // alternativ: core event internal apple: https://code.google.com/p/cocotron/source/browse/UIKit/UIEvent.h?spec=svn4a2ea12165b6894ccf7bc85a5891bc8e36e156cd&r=4a2ea12165b6894ccf7bc85a5891bc8e36e156cd
-    // https://github.com/nst/iOS-Runtime-Headers 
-    
-    if (theEvent.type == UIEventTypeRemoteControl)
-    {
-        switch(theEvent.subtype) {
-            case UIEventSubtypeRemoteControlTogglePlayPause:
-                //Insert code
-                NSLog(@"ok / off");
-                
-            case UIEventSubtypeRemoteControlPlay:
-                //Insert code
-                NSLog(@"play");
-
-                break;
-            case UIEventSubtypeRemoteControlPause:
-                // Insert code
-                 NSLog(@"pause");
-                break;
-            case UIEventSubtypeRemoteControlStop:
-                //Insert code.
-                 NSLog(@"stop");
-                break;
-            case UIEventSubtypeRemoteControlPreviousTrack:
-                NSLog(@"prev");
-                //[self rewButtonReleased:(UIButton *)rewButton];
-                break;
-            case UIEventSubtypeRemoteControlNextTrack:
-                
-                NSLog(@"next");
-            //    [self ffwButtonReleased:(UIButton *)ffwButton];
-                break; //- See more at: http://sugarrushva.my03.com/577444-remotecontrolreceivedwithevent-in-avaudio-is-not-being-called.html#sthash.SxHL7jEr.dpuf
-            case UIEventSubtypeRemoteControlBeginSeekingForward:
-                NSLog(@"begin fast forward");
-                break;
-            case UIEventSubtypeRemoteControlEndSeekingForward:
-                NSLog(@"end fast forward");
-                break;
-            default:
-                 NSLog(@"other");
-                return;
-        }
-    }
-}
 
 @end
