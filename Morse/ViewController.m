@@ -333,18 +333,19 @@ identifyclient
     if (sounder == true)
     {
         sounder = false;
+        UIImage *image2 = [UIImage imageNamed:@"key.png"];
+        [mybutton setBackgroundImage:image2 forState:UIControlStateNormal];
     }
     else
     {
         sounder = true;
+        UIImage *image2 = [UIImage imageNamed:@"kob2.png"];
+        [mybutton setBackgroundImage:image2 forState:UIControlStateNormal];
     }
 }
 
 - (void)viewDidLoad {
     NSLog(@"Load View");
-    // Image Stuff
-    UIImage *image2 = [UIImage imageNamed:@"key.png"];
-    //[img2 setImage:image2];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
@@ -372,9 +373,10 @@ identifyclient
 #pragma GCC diagnostic pop
 
     // Key text button
+    UIImage *image2 = [UIImage imageNamed:@"key.png"];
+    [mybutton setBackgroundImage:image2 forState:UIControlStateNormal];
     [mybutton addTarget:self action:@selector(buttonIsDown) forControlEvents:UIControlEventTouchDown];
     [mybutton addTarget:self action:@selector(buttonWasReleased) forControlEvents:UIControlEventTouchUpInside];
-    [mybutton setBackgroundImage:image2 forState:UIControlStateNormal];
     
     // (Un-)Latch text switch
     [sw_circuit addTarget:self action:@selector(switchcircuit) forControlEvents:UIControlEventValueChanged];
@@ -515,11 +517,17 @@ withFilterContext:(id)filterContext
     NSLog(@"code:\n");
     for(i = 0; i < SIZE_CODE; i++)NSLog(@"%i ", rx_data_packet.code[i]); NSLog(@"\n");
 #endif
-    txt_status.text = [NSString stringWithFormat:@"recv from: %s", rx_data_packet.id];
+    txt_status.text = [NSString stringWithFormat:@"recv from: %s\n", rx_data_packet.id];
+#ifdef SCROLLVIEWLOG
+    scr_view.text = [txt_status.text stringByAppendingString:scr_view.text];
+#endif
         if(rx_data_packet.n > 0 && rx_sequence != rx_data_packet.sequence){
             [self message:2];
             if(translate == 1){
-                txt_status.text = [NSString stringWithFormat:@"%s",rx_data_packet.status];
+                txt_status.text = [NSString stringWithFormat:@"%s\n",rx_data_packet.status];
+#ifdef SCROLLVIEWLOG
+                scr_view.text = [txt_status.text stringByAppendingString:scr_view.text];
+#endif
             }
             rx_sequence = rx_data_packet.sequence;
             for(i = 0; i < rx_data_packet.n; i++){
