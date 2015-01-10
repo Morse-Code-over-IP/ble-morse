@@ -125,4 +125,46 @@
     }
 }
 
+
+#pragma mark - Notifications
+#ifdef NOTIFICATIONS // TODO not yet implemented
++ (void) postNotification: (NSString *) message {
+    NSLog(@"Posting notification");
+    
+    UILocalNotification *n = [[UILocalNotification alloc] init];
+    
+    n.alertBody = message;
+    //Post the notification after 10s
+    n.fireDate = [NSDate dateWithTimeIntervalSinceNow:10];
+    n.timeZone = [NSTimeZone defaultTimeZone];
+    
+    NSMutableDictionary * d = [[NSMutableDictionary alloc] init];
+    [d setObject:@"Some data" forKey:@"data"];
+    n.userInfo = d;
+    
+    [[UIApplication sharedApplication] scheduleLocalNotification:n];
+}
+
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo{
+    NSLog(@"didReceiveRemoteNotification userInfo=%@", userInfo);
+}
+/*- (void) application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)n {
+    
+    NSLog(@"Received notification");
+    
+    NSDictionary *d = n.userInfo;
+    
+    if (d != nil) {
+        NSString* str = [d objectForKey:@"data"];
+        NSLog(@"Received data: %@", str);
+    } else {
+        NSLog(@"No data was received");
+    }
+    
+ //   [[UIApplication sharedApplication] cancelLocalNotification:n];
+
+}*/
+#endif
+
 @end

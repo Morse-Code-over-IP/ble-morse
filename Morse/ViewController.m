@@ -617,7 +617,8 @@ fastclock(void)
 #endif
     //if (tx_data_packet.code[0]>0) return; // assert first pause
 
-    if(tx_data_packet.n == 2 ) return; // assert only two packages // FIXME??
+    //if(tx_data_packet.n == 2 ) {NSLog(@"tx_data.n eq 2");return;} // assert only two packages // FIXME??
+    if (tx_data_packet.n <= 1) {return;}
     
     tx_sequence++;
     tx_data_packet.sequence = tx_sequence;
@@ -630,7 +631,7 @@ fastclock(void)
 {
     int i;
     NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
-    for(i = 0; i < 5; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    for(i = 0; i < 2; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
 #ifdef DEBUG_NET
     NSLog(@"sent seq %d n %d (%d,%d).", tx_sequence, tx_data_packet.n,
           tx_data_packet.code[0] ,
@@ -638,6 +639,8 @@ fastclock(void)
           );
 #endif
 }
+
+
 - (void)latch
 {
     NSLog(@"latch");
@@ -652,7 +655,11 @@ fastclock(void)
     
     tx_data_packet.n = 0;
     circuit = LATCHED;
+#ifdef NOTIFICATIONS //TODO not implemented yet
+    //[ postNotification:@"Hello World"];
+#endif
 }
+
 
 -(void) unlatch
 {

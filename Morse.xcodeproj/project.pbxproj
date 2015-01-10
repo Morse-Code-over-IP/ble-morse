@@ -9,13 +9,17 @@
 /* Begin PBXBuildFile section */
 		7F0093531A5C9B1A00FA34F4 /* clack48.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7F0093511A5C9B1A00FA34F4 /* clack48.wav */; };
 		7F0093541A5C9B1A00FA34F4 /* click48.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7F0093521A5C9B1A00FA34F4 /* click48.wav */; };
+		7F0E9E261A61D0B600CDE9C2 /* key.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F0E9E251A61D0B600CDE9C2 /* key.xcassets */; };
+		7F0E9E281A61D0E300CDE9C2 /* key1.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F0E9E271A61D0E300CDE9C2 /* key1.png */; };
+		7F0E9E2A1A61D16900CDE9C2 /* kob.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F0E9E291A61D16900CDE9C2 /* kob.png */; };
+		7F0E9E2C1A61D19900CDE9C2 /* kob1.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F0E9E2B1A61D19900CDE9C2 /* kob1.png */; };
+		7F0E9E2E1A61D1A700CDE9C2 /* kob.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F0E9E2D1A61D1A700CDE9C2 /* kob.xcassets */; };
 		7F162FAA1A5B0E4600945D4C /* cwprotocol.c in Sources */ = {isa = PBXBuildFile; fileRef = 7F162FA91A5B0E4600945D4C /* cwprotocol.c */; };
 		7F1E35321A5AE782008D519D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35311A5AE782008D519D /* main.m */; };
 		7F1E35351A5AE782008D519D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35341A5AE782008D519D /* AppDelegate.m */; };
 		7F1E35381A5AE782008D519D /* Morse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35361A5AE782008D519D /* Morse.xcdatamodeld */; };
 		7F1E353B1A5AE782008D519D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E353A1A5AE782008D519D /* ViewController.m */; };
 		7F1E353E1A5AE782008D519D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E353C1A5AE782008D519D /* Main.storyboard */; };
-		7F1E35401A5AE782008D519D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E353F1A5AE782008D519D /* Images.xcassets */; };
 		7F1E35431A5AE782008D519D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E35411A5AE782008D519D /* LaunchScreen.xib */; };
 		7F1E354F1A5AE782008D519D /* MorseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E354E1A5AE782008D519D /* MorseTests.m */; };
 		7F1E355A1A5B0353008D519D /* one.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E35581A5B0353008D519D /* one.png */; };
@@ -36,6 +40,11 @@
 /* Begin PBXFileReference section */
 		7F0093511A5C9B1A00FA34F4 /* clack48.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = clack48.wav; sourceTree = "<group>"; };
 		7F0093521A5C9B1A00FA34F4 /* click48.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = click48.wav; sourceTree = "<group>"; };
+		7F0E9E251A61D0B600CDE9C2 /* key.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = key.xcassets; sourceTree = "<group>"; };
+		7F0E9E271A61D0E300CDE9C2 /* key1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = key1.png; sourceTree = "<group>"; };
+		7F0E9E291A61D16900CDE9C2 /* kob.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = kob.png; sourceTree = "<group>"; };
+		7F0E9E2B1A61D19900CDE9C2 /* kob1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = kob1.png; sourceTree = "<group>"; };
+		7F0E9E2D1A61D1A700CDE9C2 /* kob.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = kob.xcassets; sourceTree = "<group>"; };
 		7F162FA81A5B0E2900945D4C /* cwprotocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cwprotocol.h; sourceTree = "<group>"; };
 		7F162FA91A5B0E4600945D4C /* cwprotocol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cwprotocol.c; sourceTree = "<group>"; };
 		7F1E352C1A5AE782008D519D /* Morse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Morse.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,7 +56,6 @@
 		7F1E35391A5AE782008D519D /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		7F1E353A1A5AE782008D519D /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		7F1E353D1A5AE782008D519D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		7F1E353F1A5AE782008D519D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		7F1E35421A5AE782008D519D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		7F1E35481A5AE782008D519D /* MorseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MorseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F1E354D1A5AE782008D519D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -105,7 +113,6 @@
 				7FC525C71A5B3651005A89CA /* Networking */,
 				7F1E35361A5AE782008D519D /* Morse.xcdatamodeld */,
 				7F1E353C1A5AE782008D519D /* Main.storyboard */,
-				7F1E353F1A5AE782008D519D /* Images.xcassets */,
 				7F1E35411A5AE782008D519D /* LaunchScreen.xib */,
 				7F1E352F1A5AE782008D519D /* Supporting Files */,
 			);
@@ -115,8 +122,13 @@
 		7F1E352F1A5AE782008D519D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				7F0E9E251A61D0B600CDE9C2 /* key.xcassets */,
 				7FA557D21A5F227C00240D74 /* key.png */,
+				7F0E9E2D1A61D1A700CDE9C2 /* kob.xcassets */,
+				7F0E9E291A61D16900CDE9C2 /* kob.png */,
+				7F0E9E271A61D0E300CDE9C2 /* key1.png */,
 				7F1E35581A5B0353008D519D /* one.png */,
+				7F0E9E2B1A61D19900CDE9C2 /* kob1.png */,
 				7F0093511A5C9B1A00FA34F4 /* clack48.wav */,
 				7F0093521A5C9B1A00FA34F4 /* click48.wav */,
 				7F1E35301A5AE782008D519D /* Info.plist */,
@@ -241,13 +253,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F0E9E2E1A61D1A700CDE9C2 /* kob.xcassets in Resources */,
+				7F0E9E2A1A61D16900CDE9C2 /* kob.png in Resources */,
 				7F1E355A1A5B0353008D519D /* one.png in Resources */,
+				7F0E9E261A61D0B600CDE9C2 /* key.xcassets in Resources */,
 				7F1E353E1A5AE782008D519D /* Main.storyboard in Resources */,
 				7F1E35431A5AE782008D519D /* LaunchScreen.xib in Resources */,
 				7FA557D31A5F227C00240D74 /* key.png in Resources */,
+				7F0E9E2C1A61D19900CDE9C2 /* kob1.png in Resources */,
+				7F0E9E281A61D0E300CDE9C2 /* key1.png in Resources */,
 				7F0093531A5C9B1A00FA34F4 /* clack48.wav in Resources */,
 				7F0093541A5C9B1A00FA34F4 /* click48.wav in Resources */,
-				7F1E35401A5AE782008D519D /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,6 +410,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Morse/Info.plist;
@@ -408,6 +425,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Morse/Info.plist;
