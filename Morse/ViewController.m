@@ -137,6 +137,8 @@ identifyclient
     
     // Start Keepalive timer
     myTimer = [NSTimer scheduledTimerWithTimeInterval: KEEPALIVE_CYCLE/100 target: self selector: @selector(sendkeepalive:) userInfo: nil repeats: YES];
+    
+    connect = CONNECTED;
 }
 
 - (void)disconnectMorse
@@ -145,6 +147,7 @@ identifyclient
     // Stop keepalive timer
     [myTimer invalidate];
     txt_server.text = @"NONE";
+    connect = DISCONNECTED;
 }
 
 - (void)createToneUnit
@@ -259,12 +262,10 @@ identifyclient
 {
     if (circuit == LATCHED)
     {
-        circuit = UNLATCHED;
         [self unlatch];
     }
     else
     {
-        circuit = LATCHED;
         [self latch];
     }
 }
@@ -273,12 +274,10 @@ identifyclient
 {
     if (connect == CONNECTED)
     {
-        connect = DISCONNECTED;
         [self disconnectMorse];
     }
     else
     {
-        connect = CONNECTED;
         [self connectMorse];
     }
 }
@@ -582,6 +581,8 @@ fastclock(void)
 }
 - (void)latch
 {
+    NSLog(@"latch");
+
     tx_sequence++;
     tx_data_packet.sequence = tx_sequence;
     tx_data_packet.code[0] = -1;
@@ -591,11 +592,13 @@ fastclock(void)
     [self send_tx_packet];
     
     tx_data_packet.n = 0;
-    NSLog(@"latch");
+    circuit = LATCHED;
 }
 
 -(void) unlatch
 {
+    NSLog(@"unlatch");
+
     tx_sequence++;
     tx_data_packet.sequence = tx_sequence;
     tx_data_packet.code[0] = -1;
@@ -605,8 +608,8 @@ fastclock(void)
     [self send_tx_packet];
     
     tx_data_packet.n = 0;
-    NSLog(@"unlatch");
     
+    circuit = UNLATCHED;
 }
 
 -(void) sendkeepalive:(NSTimer*)t
