@@ -23,6 +23,7 @@
 //#undef DEBUG
 //#define DEBUG_NET
 //#define DEBUG_TX
+//#define EXT_KEY
 
 OSStatus RenderTone(
                     void *inRefCon,
@@ -339,6 +340,9 @@ identifyclient
     [self initCWvars];
     [self inittone];
     [self displaywebstuff];
+#ifdef EXT_KEY
+    [self beep:(1000)];
+#endif
     
     // does not work yet [self play_clack];
     enter_id.delegate = self;
@@ -656,6 +660,7 @@ fastclock(void)
 
  // TODO: Bluetooth serial support? http://www.adafruit.com/products/1697
 
+#ifdef EXT_KEY
 /*
  1(Tip) - Key (Masse)
  2 - Ear (Kontakt)
@@ -672,6 +677,6 @@ fastclock(void)
  
  ton auf kanal -> empfange lautstärke -> an / aus
  */
-
+#endif
 
 @end
