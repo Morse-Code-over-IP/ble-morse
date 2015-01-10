@@ -65,7 +65,7 @@
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NNS-t8-0xb">
                                 <rect key="frame" x="239" y="15" width="51" height="31"/>
                                 <variation key="widthClass=compact" fixedFrame="YES">
-                                    <rect key="frame" x="16" y="29" width="51" height="31"/>
+                                    <rect key="frame" x="18" y="29" width="51" height="31"/>
                                 </variation>
                             </switch>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Circuit" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ayZ-cj-DMi">
@@ -91,7 +91,7 @@
                                     <rect key="frame" x="76" y="395" width="286" height="30"/>
                                 </variation>
                             </textField>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="kBa-3k-Cm1">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="kBa-3k-Cm1">
                                 <rect key="frame" x="84" y="341" width="286" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -129,17 +129,29 @@
                                     <rect key="frame" x="16" y="351" width="563" height="21"/>
                                 </variation>
                             </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GKA-Q0-oqB">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="438" width="376" height="142"/>
+                                </variation>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
                         <variation key="default">
                             <mask key="subviews">
                                 <exclude reference="kBa-3k-Cm1"/>
+                                <exclude reference="GKA-Q0-oqB"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
                             <mask key="subviews">
                                 <include reference="kBa-3k-Cm1"/>
+                                <include reference="GKA-Q0-oqB"/>
                             </mask>
                         </variation>
                     </view>
@@ -147,6 +159,7 @@
                         <outlet property="enter_channel" destination="kBa-3k-Cm1" id="yui-ca-aoQ"/>
                         <outlet property="enter_id" destination="bjt-pN-P0J" id="c5j-dY-hlD"/>
                         <outlet property="mybutton" destination="7sn-iI-3Y1" id="Szm-Ui-O31"/>
+                        <outlet property="scr_view" destination="GKA-Q0-oqB" id="53M-Jz-i3D"/>
                         <outlet property="sw_circuit" destination="FLQ-1h-e8x" id="abl-ho-t8x"/>
                         <outlet property="sw_connect" destination="NNS-t8-0xb" id="I7B-ut-jMm"/>
                         <outlet property="txt_channel" destination="TdE-Kw-d98" id="yFc-e4-FqV"/>

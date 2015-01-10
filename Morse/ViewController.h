@@ -70,6 +70,7 @@
 @property (strong, nonatomic) IBOutlet UITextField *enter_id;
 @property (strong, nonatomic) IBOutlet UITextField *enter_channel;
 
+@property (strong, nonatomic) IBOutlet UITextView *scr_view;
 @property (weak, nonatomic) IBOutlet UIButton *mybutton;
 
 @property (weak, nonatomic) IBOutlet UILabel *txt_server;

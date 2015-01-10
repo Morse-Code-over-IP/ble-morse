@@ -81,9 +81,8 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 
 @implementation ViewController
 @synthesize txt_server, txt_status, txt_channel, txt_id;
-
+@synthesize scr_view;
 @synthesize webview;
-
 @synthesize sw_connect, sw_circuit;
 @synthesize enter_id, enter_channel;
 @synthesize mybutton;
@@ -109,16 +108,21 @@ identifyclient
     char hostname[64] = "mtc-kob.dyndns.org"; // FIXME - make global
     char port1[16] = "7890";
     
-    char *id = (char *)[enter_id.text UTF8String]; // = ;//"iOS/DG6FL, intl. Morse"; // FIXME - make global
-    int channel = atoi([enter_channel.text UTF8String]); //33;
+    char *id = (char *)[enter_id.text UTF8String];
+    int channel = atoi([enter_channel.text UTF8String]);
+    
+    if (strcmp(id,"")==0 || channel == 0 || channel > MAX_CHANNEL) { 
+        NSLog(@"Connect only with ID and channel");
+        [self disconnectMorse];
+        return;
+    }
     
     prepare_id (&id_packet, id);
     prepare_tx (&tx_data_packet, id);
     connect_packet.channel = channel;
     
     txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port1];
-    //txt_channel.text = [NSString stringWithFormat:@"ch: %d", channel];
-   
+    
     udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     
     NSError *error = nil;
@@ -147,7 +151,9 @@ identifyclient
     // Stop keepalive timer
     [myTimer invalidate];
     txt_server.text = @"NONE";
+    //udpSocket.finalize;
     connect = DISCONNECTED;
+    [sw_connect setOn:false];
 }
 
 - (void)createToneUnit
@@ -265,6 +271,7 @@ identifyclient
 #ifdef DEBUG
     NSLog(@"Text field did begin editing");
 #endif
+    [self disconnectMorse];
 }
 
 // This method is called once we complete editing
@@ -272,6 +279,8 @@ identifyclient
 #ifdef DEBUG
     NSLog(@"Text field ended editing");
 #endif
+    [sw_connect setOn:true];
+    [self connectMorse];
 }
 
 // This method enables or disables the processing of return key
@@ -344,10 +353,12 @@ identifyclient
     [self beep:(1000)];
 #endif
     
-    // does not work yet [self play_clack];
     enter_id.delegate = self;
     enter_channel.delegate = self;
 
+    scr_view.editable = false;
+    scr_view.text = @" ";
+    scr_view.scrollEnabled = true;
 }
 
 
@@ -366,7 +377,7 @@ identifyclient
             if(last_message == msg) return;
             if(last_message == 2) NSLog(@"\n");
             last_message = msg;
-            txt_status.text = [NSString stringWithFormat:@"Transmitting"];
+            txt_status.text =[NSString stringWithFormat:@"Transmitting\n"];
             break;
         case 2:
             if(last_message == msg && strncmp(last_sender, rx_data_packet.id, 3) == 0) return;
@@ -374,18 +385,19 @@ identifyclient
                 if(last_message == 2) NSLog(@"\n");
                 last_message = msg;
                 strncpy(last_sender, rx_data_packet.id, 3);
-                txt_status.text = [NSString stringWithFormat:@"recv: (%s).",rx_data_packet.id];
+                txt_status.text = [NSString stringWithFormat:@"recv: (%s).\n",rx_data_packet.id];
             }
             break;
         case 3:
-            txt_status.text = [NSString stringWithFormat:@"latched by %s.",rx_data_packet.id];
+            txt_status.text = [NSString stringWithFormat:@"latched by %s.\n",rx_data_packet.id];
             break;
         case 4:
-            txt_status.text = [NSString stringWithFormat:@"unlatched by %s.",rx_data_packet.id];
+            txt_status.text = [NSString stringWithFormat:@"unlatched by %s.\n",rx_data_packet.id];
             break;
         default:
             break;
     }
+    //scr_view.text = [txt_status.text stringByAppendingString:scr_view.text];
 }
 
 
