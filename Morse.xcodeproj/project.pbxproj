@@ -121,6 +121,7 @@
 				7F1E35361A5AE782008D519D /* Morse.xcdatamodeld */,
 				7F1E353C1A5AE782008D519D /* Main.storyboard */,
 				7F1E35411A5AE782008D519D /* LaunchScreen.xib */,
+				7F5C5ACF1A62F0B5001B6727 /* iPublicUtility */,
 				7F5C5AC11A62F020001B6727 /* fft */,
 				7F1E352F1A5AE782008D519D /* Supporting Files */,
 				7FC525C71A5B3651005A89CA /* Networking */,
@@ -175,6 +176,13 @@
 				7F5C5ABE1A62F01C001B6727 /* SpectrumAnalysis.cpp */,
 			);
 			name = fft;
+			sourceTree = "<group>";
+		};
+		7F5C5ACF1A62F0B5001B6727 /* iPublicUtility */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = iPublicUtility;
 			sourceTree = "<group>";
 		};
 		7FC525C71A5B3651005A89CA /* Networking */ = {
