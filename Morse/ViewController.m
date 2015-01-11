@@ -19,7 +19,8 @@
 #include <mach/clock.h>
 #include <mach/mach.h>
 
-#define SERVERNAME "mtc-kob.dyndns.org"
+#define SERVERNAME "morsecode.dyndns.org"
+//#define SERVERNAME "mtc-kob.dyndns.org" // FIXME: switch with sounder
 
 
 //#undef DEBUG
