@@ -18,7 +18,6 @@
 		7F1E35321A5AE782008D519D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35311A5AE782008D519D /* main.m */; };
 		7F1E35351A5AE782008D519D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35341A5AE782008D519D /* AppDelegate.m */; };
 		7F1E35381A5AE782008D519D /* Morse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E35361A5AE782008D519D /* Morse.xcdatamodeld */; };
-		7F1E353B1A5AE782008D519D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E353A1A5AE782008D519D /* ViewController.m */; };
 		7F1E353E1A5AE782008D519D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E353C1A5AE782008D519D /* Main.storyboard */; };
 		7F1E35431A5AE782008D519D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1E35411A5AE782008D519D /* LaunchScreen.xib */; };
 		7F1E354F1A5AE782008D519D /* MorseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E354E1A5AE782008D519D /* MorseTests.m */; };
@@ -31,6 +30,7 @@
 		7F5C5AE01A62F298001B6727 /* CAXException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7F5C5ADC1A62F298001B6727 /* CAXException.cpp */; };
 		7F5C5AE11A62F298001B6727 /* CADebugPrintf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7F5C5ADD1A62F298001B6727 /* CADebugPrintf.cpp */; };
 		7F5C5AE21A62F298001B6727 /* CADebugMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7F5C5ADE1A62F298001B6727 /* CADebugMacros.cpp */; };
+		7F5C5AE81A62F688001B6727 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F5C5AE71A62F688001B6727 /* ViewController.m */; };
 		7FA557D31A5F227C00240D74 /* key.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FA557D21A5F227C00240D74 /* key.png */; };
 		7FC525C61A5B3150005A89CA /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FC525C41A5B3150005A89CA /* GCDAsyncUdpSocket.m */; };
 /* End PBXBuildFile section */
@@ -62,7 +62,6 @@
 		7F1E35341A5AE782008D519D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		7F1E35371A5AE782008D519D /* Morse.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Morse.xcdatamodel; sourceTree = "<group>"; };
 		7F1E35391A5AE782008D519D /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		7F1E353A1A5AE782008D519D /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		7F1E353D1A5AE782008D519D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7F1E35421A5AE782008D519D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		7F1E35481A5AE782008D519D /* MorseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MorseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,6 +86,7 @@
 		7F5C5ADD1A62F298001B6727 /* CADebugPrintf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CADebugPrintf.cpp; sourceTree = "<group>"; };
 		7F5C5ADE1A62F298001B6727 /* CADebugMacros.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CADebugMacros.cpp; sourceTree = "<group>"; };
 		7F5C5AE31A62F333001B6727 /* aurioTouch_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aurioTouch_Prefix.pch; sourceTree = "<group>"; };
+		7F5C5AE71A62F688001B6727 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		7FA557D21A5F227C00240D74 /* key.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = key.png; sourceTree = "<group>"; };
 		7FC525C31A5B3150005A89CA /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		7FC525C41A5B3150005A89CA /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
@@ -113,6 +113,7 @@
 		7F1E35231A5AE782008D519D = {
 			isa = PBXGroup;
 			children = (
+				7F5C5AE41A62F586001B6727 /* Classes */,
 				7F1E352E1A5AE782008D519D /* Morse */,
 				7F1E354B1A5AE782008D519D /* MorseTests */,
 				7F1E352D1A5AE782008D519D /* Products */,
@@ -133,8 +134,8 @@
 			children = (
 				7F1E35331A5AE782008D519D /* AppDelegate.h */,
 				7F1E35341A5AE782008D519D /* AppDelegate.m */,
+				7F5C5AE71A62F688001B6727 /* ViewController.m */,
 				7F1E35391A5AE782008D519D /* ViewController.h */,
-				7F1E353A1A5AE782008D519D /* ViewController.m */,
 				7F1E35361A5AE782008D519D /* Morse.xcdatamodeld */,
 				7F1E353C1A5AE782008D519D /* Main.storyboard */,
 				7F1E35411A5AE782008D519D /* LaunchScreen.xib */,
@@ -185,8 +186,6 @@
 		7F5C5AC11A62F020001B6727 /* fft */ = {
 			isa = PBXGroup;
 			children = (
-				7F5C5AC21A62F077001B6727 /* FFTBufferManager.h */,
-				7F5C5AC31A62F077001B6727 /* FFTBufferManager.cpp */,
 				7F5C5ABB1A62F01C001B6727 /* rad2fft.h */,
 				7F5C5ABC1A62F01C001B6727 /* rad2fft.c */,
 				7F5C5ABD1A62F01C001B6727 /* SpectrumAnalysis.h */,
@@ -212,6 +211,16 @@
 				7F5C5AD41A62F241001B6727 /* aurio_helper.cpp */,
 			);
 			name = iPublicUtility;
+			sourceTree = "<group>";
+		};
+		7F5C5AE41A62F586001B6727 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				7F5C5AC21A62F077001B6727 /* FFTBufferManager.h */,
+				7F5C5AC31A62F077001B6727 /* FFTBufferManager.cpp */,
+			);
+			name = Classes;
+			path = Morse;
 			sourceTree = "<group>";
 		};
 		7FC525C71A5B3651005A89CA /* Networking */ = {
@@ -358,10 +367,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F5C5AE81A62F688001B6727 /* ViewController.m in Sources */,
 				7F5C5AE01A62F298001B6727 /* CAXException.cpp in Sources */,
 				7F1E35351A5AE782008D519D /* AppDelegate.m in Sources */,
 				7F1E35381A5AE782008D519D /* Morse.xcdatamodeld in Sources */,
-				7F1E353B1A5AE782008D519D /* ViewController.m in Sources */,
 				7FC525C61A5B3150005A89CA /* GCDAsyncUdpSocket.m in Sources */,
 				7F5C5ADF1A62F298001B6727 /* CAStreamBasicDescription.cpp in Sources */,
 				7F5C5AD51A62F241001B6727 /* aurio_helper.cpp in Sources */,

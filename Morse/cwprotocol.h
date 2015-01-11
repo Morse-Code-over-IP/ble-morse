@@ -3,7 +3,8 @@
 
 #define INTERFACE_VERSION "irmc v0.02"
 
-#define MAX_CHANNEL 1000 // FIXME: from protocol
+#define MAX_CHANNEL 10000 // FIXME: from protocol
+#define CW_SEND_RETRIES 5 // the lower the more bad the signal
 
 // Structures for the packets: unsigned short command
 #define DIS 0x0002 // disconnect

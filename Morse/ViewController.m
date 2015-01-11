@@ -8,19 +8,21 @@
 
 #import "ViewController.h"
 #import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
 #import <netdb.h>
 #import <netinet/in.h>
 #import <netinet6/in6.h>
 #import <arpa/inet.h>
-#include "cwprotocol.h"
-
-#import <AVFoundation/AVFoundation.h>
-
 #include <mach/clock.h>
 #include <mach/mach.h>
 
-#define SERVERNAME "morsecode.dyndns.org"
-//#define SERVERNAME "mtc-kob.dyndns.org" // FIXME: switch with sounder
+#include "cwprotocol.h"
+
+//#import "FFTBufferManager.h"
+
+#define SERVERNAME_MORSE "morsecode.dyndns.org"
+#define SERVERNAME_SOUNDER "mtc-kob.dyndns.org" 
+#define PORT 7890
 
 
 //#undef DEBUG
@@ -112,8 +114,6 @@ identifyclient
 - (void)connectMorse
 {
     NSLog(@"Connect to server");
-    char hostname[64] = SERVERNAME; // FIXME - make global
-    char port1[16] = "7890";
     
     char *id = (char *)[enter_id.text UTF8String];
     int channel = atoi([enter_channel.text UTF8String]);
@@ -128,7 +128,7 @@ identifyclient
     prepare_tx (&tx_data_packet, id);
     connect_packet.channel = channel;
     
-    txt_server.text = [NSString stringWithFormat:@"srv: %s:%s", hostname, port1];
+    txt_server.text = [NSString stringWithFormat:@"srv: %@:%d", host, port];
     
     udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     
@@ -276,8 +276,8 @@ identifyclient
     circuit = LATCHED;
     connect = DISCONNECTED;
     
-    host = @SERVERNAME;
-    port = 7890;
+    host = @SERVERNAME_MORSE;
+    port = PORT;
 
     // init id selector
     enter_id.placeholder = @"iOS/DG6FL, intl. Morse";
@@ -341,12 +341,18 @@ identifyclient
         sounder = false;
         UIImage *image2 = [UIImage imageNamed:@"key.png"];
         [mybutton setBackgroundImage:image2 forState:UIControlStateNormal];
+      //  [self disconnectMorse]; // FIXME: switch servers
+     //   host = @SERVERNAME_MORSE;
+      //  [self connectMorse];
     }
     else
     {
         sounder = true;
         UIImage *image2 = [UIImage imageNamed:@"kob2.png"];
         [mybutton setBackgroundImage:image2 forState:UIControlStateNormal];
+      //  [self disconnectMorse];
+      //  host = @SERVERNAME_SOUNDER;
+      //  [self connectMorse];
     }
 }
 
@@ -420,7 +426,7 @@ identifyclient
 
 -(void)displaywebstuff
 {
-    NSString *urlAddress = @SERVERNAME;
+    NSString *urlAddress = host;
     NSURL *url = [NSURL URLWithString:urlAddress];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webview loadRequest:requestObj];
@@ -702,7 +708,7 @@ fastclock(void)
 {
     int i;
     NSData *cc = [NSData dataWithBytes:&tx_data_packet length:sizeof(tx_data_packet)];
-    for(i = 0; i < 2; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
+    for(i = 0; i < CW_SEND_RETRIES; i++) [udpSocket sendData:cc toHost:host port:port withTimeout:-1 tag:tx_sequence];
 #ifdef DEBUG_NET
     NSLog(@"sent seq %d n %d (%d,%d).", tx_sequence, tx_data_packet.n,
           tx_data_packet.code[0] ,
