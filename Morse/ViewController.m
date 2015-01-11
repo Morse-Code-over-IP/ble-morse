@@ -763,7 +763,43 @@ fastclock(void)
 }
 
 
- // TODO: Bluetooth serial support? http://www.adafruit.com/products/1697
+ /*
+TODO: Bluetooth serial support? 
+  http://www.adafruit.com/products/1697 20$, appstore possible
+alternative to this: more information on arduino: https://github.com/michaelkroll/BLE-Shield diy shield
+  http://learn.adafruit.com/downloads/pdf/getting-started-with-the-nrf8001-bluefruit-le-breakout.pdf
+  http://www.nordicsemi.com/eng/Products/Bluetooth-Smart-Bluetooth-low-energy/nRF8001
+  
+  SCK
+  MISO
+  MOSI
+  REQ
+  RDY
+  ACT
+  RST
+  3Vo
+  GND
+  VIN
+  
+  
+  http://kob.sdf.org/morsekob/interface.htm#portpins
+  RS232     DB9     Function    
+  DTR       4       Manual Key / paddle common
+  DSR       6       Manual key / dot paddle
+  CTS       8       Dash paddle
+  RTS       7       Sounder output
+  SG        5       Sounder ground
+ 
+ */
+
+
+
+// TODO: Serial cable: - no app store possible, 70$
+// http://redpark.com/lightning-serial-cable-l2-db9v/
+
+
+
+
 
 #ifdef EXT_KEY
 /*
@@ -778,6 +814,7 @@ fastclock(void)
  
  
  https://web.eecs.umich.edu/~prabal/pubs/papers/kuo10hijack.pdf
+ https://code.google.com/p/hijack-main/
  
  
  ton auf kanal -> empfange lautstärke -> an / aus
