@@ -19,6 +19,8 @@
 #include <mach/clock.h>
 #include <mach/mach.h>
 
+#define SERVERNAME "mtc-kob.dyndns.org"
+
 
 //#undef DEBUG
 //#define DEBUG_NET
@@ -109,7 +111,7 @@ identifyclient
 - (void)connectMorse
 {
     NSLog(@"Connect to server");
-    char hostname[64] = "mtc-kob.dyndns.org"; // FIXME - make global
+    char hostname[64] = SERVERNAME; // FIXME - make global
     char port1[16] = "7890";
     
     char *id = (char *)[enter_id.text UTF8String];
@@ -273,7 +275,7 @@ identifyclient
     circuit = LATCHED;
     connect = DISCONNECTED;
     
-    host = @"mtc-kob.dyndns.org";
+    host = @SERVERNAME;
     port = 7890;
 
     // init id selector
@@ -417,7 +419,7 @@ identifyclient
 
 -(void)displaywebstuff
 {
-    NSString *urlAddress = @"http://mtc-kob.dyndns.org";
+    NSString *urlAddress = @SERVERNAME;
     NSURL *url = [NSURL URLWithString:urlAddress];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webview loadRequest:requestObj];

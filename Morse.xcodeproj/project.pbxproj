@@ -86,6 +86,7 @@
 		7F5C5ADC1A62F298001B6727 /* CAXException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAXException.cpp; sourceTree = "<group>"; };
 		7F5C5ADD1A62F298001B6727 /* CADebugPrintf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CADebugPrintf.cpp; sourceTree = "<group>"; };
 		7F5C5ADE1A62F298001B6727 /* CADebugMacros.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CADebugMacros.cpp; sourceTree = "<group>"; };
+		7F5C5AE31A62F333001B6727 /* aurioTouch_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aurioTouch_Prefix.pch; sourceTree = "<group>"; };
 		7FA557D21A5F227C00240D74 /* key.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = key.png; sourceTree = "<group>"; };
 		7FC525C31A5B3150005A89CA /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		7FC525C41A5B3150005A89CA /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
@@ -197,6 +198,7 @@
 		7F5C5ACF1A62F0B5001B6727 /* iPublicUtility */ = {
 			isa = PBXGroup;
 			children = (
+				7F5C5AE31A62F333001B6727 /* aurioTouch_Prefix.pch */,
 				7F5C5AD61A62F298001B6727 /* CAMath.h */,
 				7F5C5AD71A62F298001B6727 /* CADebugPrintf.h */,
 				7F5C5AD81A62F298001B6727 /* CADebugMacros.h */,
