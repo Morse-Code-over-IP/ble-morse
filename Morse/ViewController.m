@@ -89,6 +89,7 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @synthesize enter_id, enter_channel;
 @synthesize mybutton;
 
+//FIXME: This method can go into cwcom. - abstract from socket methods
 // connect to server and send my id.
 - (void)
 identifyclient
@@ -104,6 +105,7 @@ identifyclient
 }
 
 
+//FIXME: This method can go into cwcom. - abstract from socket methods
 - (void)connectMorse
 {
     NSLog(@"Connect to server");
@@ -151,7 +153,7 @@ identifyclient
 {
     NSLog(@"Disconnect from server");
     // Stop keepalive timer
-    [myTimer invalidate];
+    [myTimer invalidate]; //FIXME: This method can go into cwcom.
     txt_server.text = @"NONE";
     //udpSocket.finalize;
     connect = DISCONNECTED;
@@ -256,6 +258,7 @@ identifyclient
     }
 }
 
+//FIXME: This method can go into cwcom.
 - (void)initCWvars
 {
     NSLog(@"Init CW Vars");
@@ -420,6 +423,7 @@ identifyclient
     [webview loadRequest:requestObj];
 }
 
+//FIXME: This method can go into cwcom.
 - (void) message:(int) msg
 {
     switch(msg){
@@ -499,6 +503,7 @@ identifyclient
     AudioServicesPlaySystemSound (completeSound);
 }
 
+//FIXME: This method can go into cwcom. - modify for (a) recv (b) process
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
@@ -586,6 +591,7 @@ withFilterContext:(id)filterContext
 {
 }
 
+//FIXME: This method can go into cwcom.
 /* portable time, as listed in https://gist.github.com/jbenet/1087739  */
 void current_utc_time(struct timespec *ts) {
     clock_serv_t cclock;
@@ -596,6 +602,7 @@ void current_utc_time(struct timespec *ts) {
     ts->tv_sec = mts.tv_sec;
     ts->tv_nsec = mts.tv_nsec;
 }
+//FIXME: This method can go into cwcom.
 /* a better clock() in milliseconds */
 long
 fastclock(void)
@@ -609,6 +616,7 @@ fastclock(void)
     return r;
 }
 
+//FIXME: This method can go into cwcom. - modify for buttonup
 -(void)buttonIsDown
 {
     key_press_t1 = fastclock();
@@ -629,6 +637,7 @@ fastclock(void)
     [self message:1];
 }
 
+//FIXME: This method can go into cwcom. - modify for buttondown
 -(void)buttonWasReleased
 {
     key_release_t1 = fastclock();
@@ -666,7 +675,7 @@ fastclock(void)
     //[self send_tx_packet]; // FIXME: why run the code below, if we can send right now?
 }
 
-
+//FIXME: This method can go into cwcom.
 -(void) send_data
 {
 #ifdef DEBUG_TX
@@ -685,6 +694,7 @@ fastclock(void)
     tx_data_packet.n = 0;
 }
 
+//FIXME: This method can go into cwcom.
 - (void) send_tx_packet
 {
     int i;
@@ -698,7 +708,7 @@ fastclock(void)
 #endif
 }
 
-
+//FIXME: This method can go into cwcom.
 - (void)latch
 {
     NSLog(@"latch");
@@ -720,7 +730,7 @@ fastclock(void)
 #endif
 }
 
-
+//FIXME: This method can go into cwcom.
 -(void) unlatch
 {
     NSLog(@"unlatch");
