@@ -86,8 +86,7 @@ void ToneInterruptionListener(void *inClientData, UInt32 inInterruptionState)
 @end
 
 @implementation ViewController
-@synthesize txt_server, txt_status, txt_channel, txt_id, txt_version
-;
+@synthesize txt_server, txt_status, txt_channel, txt_id, txt_version;
 @synthesize scr_view;
 @synthesize webview;
 @synthesize sw_connect, sw_circuit, sw_sounder;
