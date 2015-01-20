@@ -275,7 +275,7 @@ identifyclient
     circuit = LATCHED;
     connect = DISCONNECTED;
     
-    host = @SERVERNAME_MORSE;
+    host = @SERVERNAME_SOUNDER;
     port = PORT;
 
     // init id selector
@@ -375,7 +375,7 @@ identifyclient
     Float32 preferredBufferSize = 5./1000.; // in seconds
     result = AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration, sizeof(preferredBufferSize), &preferredBufferSize);
     
-    // get actuall buffer size
+    // get actual buffer size
     Float32 audioBufferSize;
     UInt32 size = sizeof (audioBufferSize);
     result = AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareIOBufferDuration, &size, &audioBufferSize);
@@ -426,6 +426,10 @@ identifyclient
 -(void)displaywebstuff
 {
     NSString *urlAddress = host;
+#ifdef DEBUG
+    NSLog(@"Webview:");
+    NSLog(host);
+#endif
     NSURL *url = [NSURL URLWithString:urlAddress];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webview loadRequest:requestObj];
