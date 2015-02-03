@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C94b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
@@ -82,7 +82,7 @@
                                     <rect key="frame" x="25" y="570" width="67" height="21"/>
                                 </variation>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7sn-iI-3Y1" userLabel="morse_key">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7sn-iI-3Y1" userLabel="morse_key">
                                 <rect key="frame" x="16" y="60" width="102" height="96"/>
                                 <state key="normal" backgroundImage="key.png">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -262,20 +262,20 @@
                         </variation>
                         <variation key="widthClass=compact">
                             <mask key="subviews">
-                                <exclude reference="kBa-3k-Cm1"/>
-                                <exclude reference="drI-GP-mUN"/>
-                                <exclude reference="lKL-eY-cf5"/>
-                                <exclude reference="698-NN-EBS"/>
-                                <exclude reference="7sn-iI-3Y1"/>
-                                <exclude reference="TdE-Kw-d98"/>
-                                <exclude reference="bjt-pN-P0J"/>
-                                <exclude reference="ayZ-cj-DMi"/>
-                                <exclude reference="FLQ-1h-e8x"/>
-                                <exclude reference="I68-6f-Z8e"/>
-                                <exclude reference="iOu-jm-SFw"/>
-                                <exclude reference="NNS-t8-0xb"/>
-                                <exclude reference="hNi-Mf-otf"/>
-                                <exclude reference="PRy-yq-hH1"/>
+                                <include reference="kBa-3k-Cm1"/>
+                                <include reference="drI-GP-mUN"/>
+                                <include reference="lKL-eY-cf5"/>
+                                <include reference="698-NN-EBS"/>
+                                <include reference="7sn-iI-3Y1"/>
+                                <include reference="TdE-Kw-d98"/>
+                                <include reference="bjt-pN-P0J"/>
+                                <include reference="ayZ-cj-DMi"/>
+                                <include reference="FLQ-1h-e8x"/>
+                                <include reference="I68-6f-Z8e"/>
+                                <include reference="iOu-jm-SFw"/>
+                                <include reference="NNS-t8-0xb"/>
+                                <include reference="hNi-Mf-otf"/>
+                                <include reference="PRy-yq-hH1"/>
                             </mask>
                         </variation>
                         <variation key="heightClass=compact-widthClass=regular">
