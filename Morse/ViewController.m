@@ -815,12 +815,12 @@ alternative to this: more information on arduino: https://github.com/michaelkrol
 
 #ifdef EXT_KEY
 /*
- 1(Tip) - Key (Masse)
- 2 - Ear (Kontakt)
- 3 - Ear (Masse)
- 4(Masse) - R2(46,6k ge-br?-sw-rt-br) - Key 1
- 4(Masse) - R3(22k br-rt-sw-rt-rt) - Key 2
- 4(Masse) - R1(1k br-sw-sw-br-br) - 3
+ 1(Tip) - Key (Ground)
+ 2 - Ear (Contact)
+ 3 - Ear (Ground)
+ 4(Ground) - R2(46,6k ge-br?-sw-rt-br) - Key 1
+ 4(Ground) - R3(22k br-rt-sw-rt-rt) - Key 2
+ 4(Ground) - R1(1k br-sw-sw-br-br) - 3
  
  (1) left earphone (tip), (2) right earphone (ring), (3) com- mon/ground (ring), and (4) microphone (sleeve)
  
