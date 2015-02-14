@@ -1,0 +1,16 @@
+make clean all
+make PID=0x0029 F_CPU=8000000
+copy Caterina.hex Caterina-radino_nRF8001.hex
+make clean
+make PID=0x002B F_CPU=8000000
+copy Caterina.hex Caterina-radino_CC1101.hex
+make clean all
+make PID=0x002D F_CPU=8000000
+copy Caterina.hex Caterina-radino_WiFi.hex
+make clean
+make PID=0x002F F_CPU=8000000
+copy Caterina.hex Caterina-radino_RF69.hex
+make clean
+make PID=0x0031 F_CPU=8000000
+copy Caterina.hex Caterina-radino_RF233.hex
+make clean

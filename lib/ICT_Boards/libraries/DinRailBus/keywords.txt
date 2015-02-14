@@ -1,0 +1,33 @@
+########################################
+# Syntax Coloring Map for DinRail_Master
+########################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+DinRailBus KEYWORD1
+DinRailDevice KEYWORD1
+DinRailRelais KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+read KEYWORD2
+write KEYWORD2
+getLastPacket KEYWORD2
+getLastType KEYWORD2
+read_sadr KEYWORD2
+write_sadr KEYWORD2
+relaySet KEYWORD2
+relayGet KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+DINRAIL_ERROR	LITERAL1
+DINRAIL_TIMEOUT	LITERAL1
+DINRAIL_CONVERSION_EROR	LITERAL1
+DINRAIL_MINDELAY	LITERAL1

@@ -1,0 +1,6 @@
+@ECHO OFF
+IF "%1"=="radinonrf8001" avrdude -p m32u4 -P usb -c avrispmkii -U flash:w:Caterina-radino_nRF8001.hex -U efuse:w:0xff:m -U hfuse:w:0xd8:m -U lfuse:w:0xfb:m
+IF "%1"=="radinoCC1101" avrdude -p m32u4 -P usb -c avrispmkii -U flash:w:Caterina-radino_CC1101.hex -U efuse:w:0xff:m -U hfuse:w:0xd8:m -U lfuse:w:0xfb:m
+IF "%1"=="radinoWiFi" avrdude -p m32u4 -P usb -c avrispmkii -U flash:w:Caterina-radino_WiFi.hex -U efuse:w:0xff:m -U hfuse:w:0xd8:m -U lfuse:w:0xfb:m
+IF "%1"=="radinoRF69" avrdude -p m32u4 -P usb -c avrispmkii -U flash:w:Caterina-radino_RF69.hex -U efuse:w:0xff:m -U hfuse:w:0xd8:m -U lfuse:w:0xfb:m
+IF "%1"=="radinoRF233" avrdude -p m32u4 -P usb -c avrispmkii -U flash:w:Caterina-radino_RF233.hex -U efuse:w:0xff:m -U hfuse:w:0xd8:m -U lfuse:w:0xfb:m

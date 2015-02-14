@@ -1,0 +1,1469 @@
+AT+UPLOAD
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript">
+//Various helper functions
+//Params: ElementID //Returns: Element
+function eID(ele) {return document.getElementById(ele);}
+//Params: ElementID //Returns: Element.value
+function vID(ele) {return eID(ele).value;}
+//Params: ElementID //Returns: Element.innerHTML
+function hID(ele) {return eID(ele).innerHTML;}
+//Pads a string with leading chr until len is reached
+function padString(src,len,char){
+	src = src.toString();
+  while(src.length < len){ src=char+src; }
+  return src;
+}
+
+//Selects active tab
+//Param: ID of tabElement
+var curAcTab;
+function acTab(e){
+	if (curAcTab) eID(curAcTab).className='tabDeact';
+  curAcTab = e;
+  eID(curAcTab).className='tabAct';
+	return false;
+}
+</script>
+<script type="text/javascript">
+//Executed after page finished loading
+function onLoadFunction(){
+	acTab('tabRELAIS'); //Set active tab to LED-Dimmer
+	initDimSliders(%6010%); //Initialize LED-Dimmer GUI
+  initPwmSliders(%6251%); //Initialize PWM-Driver GUI
+}
+
+//Update all LED-Dimmer channels forms to value a
+function upAllDimCh(a){
+  drsl('vsdimall',a);
+	eID('v6001').innerHTML=a; eID('nv6001').value=a; drsl('vsdim1',a);
+	eID('v6002').innerHTML=a; eID('nv6002').value=a; drsl('vsdim2',a);
+	eID('v6003').innerHTML=a; eID('nv6003').value=a; drsl('vsdim3',a);
+	eID('v6004').innerHTML=a; eID('nv6004').value=a; drsl('vsdim4',a);
+	eID('v6005').innerHTML=a; eID('nv6005').value=a; drsl('vsdim5',a);
+	eID('v6006').innerHTML=a; eID('nv6006').value=a; drsl('vsdim6',a);
+	eID('v6007').innerHTML=a; eID('nv6007').value=a; drsl('vsdim7',a);
+	eID('v6008').innerHTML=a; eID('nv6008').value=a; drsl('vsdim8',a);
+}
+
+//Initialize LED-Dimmer GUI using value max
+function initDimSliders(max){
+  var maxDimVal = parseInt(max,10);
+  if (maxDimVal==0 || isNaN(maxDimVal)) //No valid value returned. Assume there is no LED-Dimmer on this address
+		{ eID('tabDimmBody').className="hidden"; return; }
+  eID('tabDimmBody').className="";
+	eID('maxdimval').innerHTML = maxDimVal;
+	nwsl('vsdimall','nv6009','v6009','dcbdimall',maxDimVal,1,0,'6009',0,upAllDimCh);
+	//Must obey 5 simultaneous connection limit
+	rV('6001','v6001',function(a){
+    rV('6002','v6002',function(a){
+		  rV('6003','v6003',function(a){
+		    rV('6004','v6004',function(a){
+				  rV('6005','v6005',function(a){
+				    rV('6006','v6006',function(a){
+					    rV('6007','v6007',function(a){
+						    rV('6008','v6008',function(a){
+									nwsl('vsdim8','nv6008','v6008','dcbdim8',maxDimVal,1,a,'6008',0);
+								});
+								nwsl('vsdim7','nv6007','v6007','dcbdim7',maxDimVal,1,a,'6007',0);
+							});
+							nwsl('vsdim6','nv6006','v6006','dcbdim6',maxDimVal,1,a,'6006',0);
+						});
+						nwsl('vsdim5','nv6005','v6005','dcbdim5',maxDimVal,1,a,'6005',0);
+					});
+					nwsl('vsdim4','nv6004','v6004','dcbdim4',maxDimVal,1,a,'6004',0);
+				});
+				nwsl('vsdim3','nv6003','v6003','dcbdim3',maxDimVal,1,a,'6003',0);
+			});
+			nwsl('vsdim2','nv6002','v6002','dcbdim2',maxDimVal,1,a,'6002',0);
+		});
+		nwsl('vsdim1','nv6001','v6001','dcbdim1',maxDimVal,1,a,'6001',0);
+	});
+}
+
+//Update all PWM-Driver channels forms to value a
+function upAllPwmCh(a){
+  drsl('vspwmall',a);
+	eID('v6201').innerHTML=a; eID('nv6201').value=a; drsl('vs6201',a);
+	eID('v6202').innerHTML=a; eID('nv6202').value=a; drsl('vs6202',a);
+	eID('v6203').innerHTML=a; eID('nv6203').value=a; drsl('vs6203',a);
+	eID('v6204').innerHTML=a; eID('nv6204').value=a; drsl('vs6204',a);
+	eID('v6205').innerHTML=a; eID('nv6205').value=a; drsl('vs6205',a);
+	eID('v6206').innerHTML=a; eID('nv6206').value=a; drsl('vs6206',a);
+	eID('v6207').innerHTML=a; eID('nv6207').value=a; drsl('vs6207',a);
+	eID('v6208').innerHTML=a; eID('nv6208').value=a; drsl('vs6208',a);
+	eID('v6209').innerHTML=a; eID('nv6209').value=a; drsl('vs6209',a);
+	eID('v6210').innerHTML=a; eID('nv6210').value=a; drsl('vs6210',a);
+	eID('v6211').innerHTML=a; eID('nv6211').value=a; drsl('vs6211',a);
+	eID('v6212').innerHTML=a; eID('nv6212').value=a; drsl('vs6212',a);
+	eID('v6213').innerHTML=a; eID('nv6213').value=a; drsl('vs6213',a);
+	eID('v6214').innerHTML=a; eID('nv6214').value=a; drsl('vs6214',a);
+	eID('v6215').innerHTML=a; eID('nv6215').value=a; drsl('vs6215',a);
+}
+
+//Initialize LED-Driver GUI using value max
+function initPwmSliders(max){
+  var maxPwmVal = parseInt(max,10);
+  var minPwmVal = parseInt(hID('minpwmval'),10);
+  if (maxPwmVal==0 || isNaN(maxPwmVal) || isNaN(minPwmVal)) //No valid value returned. Assume there is no PWM-Driver on this address
+		{ eID('tabPwmBody').className="hidden"; return; }
+  eID('tabPwmBody').className="";
+	eID('maxpwmval').innerHTML = maxPwmVal;
+  eID('minpwmval').innerHTML = minPwmVal;
+  rV('6253','v6253',function(a){
+    rV('6221','v6221',function(a){
+    rV('6222','v6222',function(a){
+    rV('6223','v6223',function(a){
+    rV('6224','v6224',function(a){
+    rV('6225','v6225',function(a){
+    rV('6226','v6226',function(a){
+    rV('6227','v6227',function(a){
+    rV('6228','v6228',function(a){
+    rV('6229','v6229',function(a){
+    rV('6230','v6230',function(a){
+    rV('6231','v6231',function(a){
+    rV('6232','v6232',function(a){
+    rV('6233','v6233',function(a){
+    rV('6234','v6234',function(a){
+    rV('6235','v6235',function(a){
+		}); }); }); }); }); }); }); }); }); }); }); }); }); }); });
+	});
+	nwsl('vspwmall','nv6252','v6252','dcbpwmall',maxPwmVal,1,0,'6252',minPwmVal,upAllPwmCh);
+	//Must obey 5 simultaneous connection limit
+	rV('6201','v6201',function(a){
+    rV('6202','v6202',function(a){
+		  rV('6203','v6203',function(a){
+		    rV('6204','v6204',function(a){
+				  rV('6205','v6205',function(a){
+				    rV('6206','v6206',function(a){
+					    rV('6207','v6207',function(a){
+						    rV('6208','v6208',function(a){
+							    rV('6209','v6209',function(a){
+								    rV('6210','v6210',function(a){
+									    rV('6211','v6211',function(a){
+										    rV('6212','v6212',function(a){
+											    rV('6213','v6213',function(a){
+												    rV('6214','v6214',function(a){
+													    rV('6215','v6215',function(a){
+																nwsl('vs6215','nv6215','v6215','dcb6215',maxPwmVal,1,a,'6215',minPwmVal);
+															});
+															nwsl('vs6214','nv6214','v6214','dcb6214',maxPwmVal,1,a,'6214',minPwmVal);
+														});
+														nwsl('vs6213','nv6213','v6213','dcb6213',maxPwmVal,1,a,'6213',minPwmVal);
+													});
+													nwsl('vs6212','nv6212','v6212','dcb6212',maxPwmVal,1,a,'6212',minPwmVal);
+												});
+												nwsl('vs6211','nv6211','v6211','dcb6211',maxPwmVal,1,a,'6211',minPwmVal);
+											});
+											nwsl('vs6210','nv6210','v6210','dcb6210',maxPwmVal,1,a,'6210',minPwmVal);
+										});
+										nwsl('vs6209','nv6209','v6209','dcb6209',maxPwmVal,1,a,'6209',minPwmVal);
+									});
+									nwsl('vs6208','nv6208','v6208','dcb6208',maxPwmVal,1,a,'6208',minPwmVal);
+								});
+								nwsl('vs6207','nv6207','v6207','dcb6207',maxPwmVal,1,a,'6207',minPwmVal);
+							});
+							nwsl('vs6206','nv6206','v6206','dcb6206',maxPwmVal,1,a,'6206',minPwmVal);
+						});
+						nwsl('vs6205','nv6205','v6205','dcb6205',maxPwmVal,1,a,'6205',minPwmVal);
+					});
+					nwsl('vs6204','nv6204','v6204','dcb6204',maxPwmVal,1,a,'6204',minPwmVal);
+				});
+				nwsl('vs6203','nv6203','v6203','dcb6203',maxPwmVal,1,a,'6203',minPwmVal);
+			});
+			nwsl('vs6202','nv6202','v6202','dcb6202',maxPwmVal,1,a,'6202',minPwmVal);
+		});
+		nwsl('vs6201','nv6201','v6201','dcb6201',maxPwmVal,1,a,'6201',minPwmVal);
+	});
+}
+
+//Write to a register on the arduino and set some elements content accordingly
+//Params: Register, new value, elementID for Updated Value, callback function called afterwards
+function wV(reg,val,tgt,cb) {
+	var e = eID(tgt);
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","write?register="+reg+"&nval="+val,true);
+	xmlhttp.onreadystatechange =
+		function(){
+			if (xmlhttp.readyState==4 && xmlhttp.status==200){
+				e.innerHTML=xmlhttp.responseText;
+				if (cb) cb(xmlhttp.responseText);
+			} else if (xmlhttp.readyState==4){
+	      if (cb) cb(0);
+			}
+		};
+	xmlhttp.timeout=5000;
+	xmlhttp.send();
+}
+
+//Read a register on the arduino and set some elements content accordingly
+//Params: Register, elementID for Updated Value, callback function called afterwards
+function rV(reg,tgt,cb) {
+var e = eID(tgt);
+var xmlhttp=new XMLHttpRequest();
+xmlhttp.open("GET","read?register="+reg,true);
+xmlhttp.onreadystatechange =
+	function(){
+		if (xmlhttp.readyState==4 && xmlhttp.status==200){
+			e.innerHTML=xmlhttp.responseText;
+      if (cb) cb(xmlhttp.responseText);
+		} else if (xmlhttp.readyState==4){
+      if (cb) cb(0);
+		}
+	};
+xmlhttp.timeout=5000;
+xmlhttp.send();
+}
+
+//global var holding settings of slider instances
+var sliders = [];
+//called on click on a slider
+//Params: slider idx, value
+function dosl(i,a){
+	var s = sliders[i];
+	drsl(i,a);	//redrwaw
+	eID(s[1]).value = a;  //set sliders target element
+	if(eID(s[3]).checked==1)  //direct execute checkbox
+	{
+		wV(s[7],a,s[2],s[9]); //write new value to arduino
+	}
+}
+//draws the slider with index i using value a as current
+function drsl(i,a){
+	var s = sliders[i];
+	var e = eID(s[0]);
+	var c = "";
+	e.innerHTML = "";
+	for (j=s[8];;j+=s[5]){  //minVal+step
+    c = "";
+    if (j >= s[4]){ //maxval
+			c = "max "
+			j = s[4];
+		}
+		if (j==s[8]){ //minval
+			c = "min "
+		}
+		if (j > a){
+			c += "slr";
+		}else{
+			c += "sll";
+		}
+    e.innerHTML = e.innerHTML+'<div onmouseup="dosl(\''+i+'\','+j+')" class="'+c+'" title="'+j+'"></div>';
+		if (j==s[4]){
+    	break;
+		}
+	}
+}
+//instantiates a new slider
+//Params: sliderContainer, input element to write selected value, element to write val after update,
+//checkbox if update on click, max val, step, current val, target register, min val, callback
+//nwsl('vs13','nv1006','v1006','dcb13',256,1,128,'1006',0,function(){...});
+function nwsl(s,n,v,c,h,r,a,t,l,cb){
+	var i = s;
+	cb = cb || 0; //if not set
+	sliders[i] = [s,n,v,c,h,r,a,t,l,cb];  //store settings
+	drsl(i,a);  //draw
+}
+
+//Sets timerfunction to refresh a field periodically
+//Params: register, fieldID, period
+var timerCBs = [];
+function srf(r,e,p){
+	if (timerCBs[e]) clearInterval(timerCBs[e]);  //delete possibly existing timer
+	p=parseInt(p,10);
+	if(p!=NaN && p>0){
+    rV(r,e);
+		timerCBs[e]=setInterval(function(){rV(r,e);},p);
+	}
+}
+</script>
+<style type="text/css">
+body {
+	width:725px;
+	background-color:#DDDDDD;
+}
+span {
+	font-weight:bold;
+}
+img {
+	margin:0 5px;
+}
+p, form {
+	margin:0;
+	padding:0;
+}
+h4 {
+	margin:0;
+}
+.hidden {
+	height:0px;
+	visibility:hidden;
+	overflow:hidden;
+}
+#description {
+  clear:both;
+	padding:10px 0 0;
+	margin:0 0 10px;
+}
+div.tabHeader {
+	padding:5px 0;
+	height:30px;
+	clear:both;
+}
+a.tabSelect {
+	display:block;
+	width:20%;
+	margin:10px;
+	float:left;
+	cursor:pointer;
+	background:rgba(150,200,150,0.6);
+  border:1px solid rgba(100,150,100,0.6);
+	text-align:center;
+	font-weight:bold;
+}
+div#tabHolder {
+	padding-left:25px;
+}
+div.tabDeact {
+	height:0px;
+	visibility:hidden;
+	overflow:hidden;
+  float:left;
+}
+div.tabAct {
+	visibility:visible;
+	width:100%;
+	height:auto;
+  float:left;
+}
+.tabAct>*, .tabDeact>* {
+	margin:15px 0 15px 0;
+}
+.tabHead>*, .tabBody>* {
+	padding:8px 0;
+  clear:both;
+}
+.tabHead .left, .tabBody .left {
+	clear:none;
+	float:left;
+}
+.tabHead .right, .tabBody .right {
+  clear:none;
+	float:right;
+}
+div#tabRS485 button {
+	margin:10px 0 0;
+	width:60px;
+}
+form#fRs485 input {
+	margin:10px 0 0;
+	width:275px;
+}
+div#outRs485 button {
+	margin-right:30px;
+}
+div#tabRS485 textarea {
+	margin:10px 0 0;
+	width:350px;
+	height:150px;
+	display:block;
+}
+div#railContainer {
+	margin-top:25px;
+}
+form#crbc {
+	padding:5px 0 0;
+	width:370px;
+}
+form#crbc p#buts {
+	float:right;
+}
+form#crbc button {
+	margin:0 0 3px;
+  width:100px;
+}
+form#crbc input {
+	width:30px;
+	margin:2px 0;
+}
+form#crbc input#rbWr {
+	width:15px;
+}
+form#crbc input#rbVal {
+	width:90px;
+}
+div#railAddress input {
+	width: 25px;
+	margin-right:15px;
+}
+div#rgbc {
+  width:225px;
+  padding:10px;
+	border:1px solid #AAAABB;
+}
+div#rgbc button {
+	margin-left:5px;
+}
+div.tabHead input {
+	margin-left:25px;
+}
+div.tabHead button {
+	margin-right:25px;
+}
+div.dioP {
+	clear:both;
+	float:left;
+  width:500px;
+  margin:10px 0;
+  border:1px solid #AAAABB;
+}
+#tabDIMM div.dioP, #tabPWM div.dioP {
+	width:330px;
+}
+div#tabRELAIS div.dioP {
+	width:425px;
+}
+#dimall {
+	margin-left:160px;
+}
+#pwmall {
+	margin-left:100px;
+	clear:none;
+}
+#pwmGE {
+	margin-top:40px;
+}
+#pwmSingles {
+	clear:both;
+}
+div.dioP>div>div {
+	margin:3px 10px 0 0;
+	padding:5px;
+  float:left;
+}
+div.dioStat button {
+	margin:0 5px 0 15px;
+}
+div.slider {
+  height: 30px;
+  padding: 0px 5px;
+}
+div.slider>div{
+	margin-top:10px;
+	height:20px;
+	float:left;
+  width:2px;
+  cursor:pointer;
+}
+div#tabDIMM div.slider>div{
+  width:4px;
+}
+.sll{
+	background-color: blue;
+}
+.slr{
+	background-color: orange;
+}
+div.slider>div.min{
+	width:10px;
+	margin-right:2px;
+}
+div#tabDIMM div.slider>div.min{
+	width:20px
+}
+div.slider>div.max{
+  width:10px;
+	margin-left:2px;
+}
+div#tabDIMM div.slider>div.max{
+	width:20px
+}
+div.slider>div:hover{
+	background-color:#bcbcbc !important;
+}
+input.pwm{
+	width:30px;
+}
+div#relaisCBs>div{
+	width:275px;
+	padding:5px 0;
+	clear:both;
+}
+div#relaisCBs>div>label{
+	margin-right:10px;
+}
+div#relaisCBs>div>button{
+	margin:2px;
+	float:right;
+}
+</style>
+</head>
+<body onload="onLoadFunction();">
+<img style="float:left;" src="data:image/png;base64,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" />
+<img style="float:left;" src="data:image/png;base64,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" />
+<h2>Welcome on<br />In-Circuit radino</h2>
+
+<div id="description">
+<p>This is a demo for accessing the radino WiFi using the<br />http protocol through a http server runnning on the ESP8266.</p>
+<ul>
+<li>Access D13 to which the onboard LED is wired</li>
+<li>Interface with the RS485 on the DinRailBus</li>
+<li>Access DIN-Rail devices via DinRailBus protocol</li>
+</ul>
+</div>
+
+<div id="tabHeader">
+<a class="tabSelect" onclick="return acTab('tabPINS');">radino Pins</a>
+<a class="tabSelect" onclick="return acTab('tabRS485');">RS485</a>
+<div style="clear:both;"></div>
+<a class="tabSelect" onclick="return acTab('tabDIMM');">LED-Dimmer</a>
+<a class="tabSelect" onclick="return acTab('tabRELAIS');">Relais 6I6S</a>
+<a class="tabSelect" onclick="return acTab('tabADDA');">ADDA 6I4O</a>
+<a class="tabSelect" onclick="return acTab('tabPWM');">PWM-Driver</a>
+<div style="clear:both;"></div>
+</div>
+<div id="tabHolder">
+
+<div class="tabDeact" id="tabPINS">
+<h3>Description</h3>
+<!--<div class="tabHead">
+</div>-->
+
+<div class="tabBody">
+<div id="pwm13">
+<h4>Accessing onBoard LED on D13</h4>
+<div class="dioP" id="p13">
+<div>
+<div class="dioStat">
+<strong>onBoardLED (D13):</strong> <span id="v1013">%1013%</span> <span id="v1113">%1113%</span>
+<button type="button" onclick="rV('1013','v1013');rV('1113','v1113');">Refresh</button>
+<label>Auto</label>
+<select id="rtD13" onChange="srf('1013','v1013',vID('rtD13'));srf('1113','v1113',vID('rtD13'));">
+<option value="0" id="rtD13DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtD13DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<input id="nv1013" type="text" maxlength="3" class="pwm" />
+<button type="button" onclick="wV('1013',vID('nv1013'),'v1013');">Set Value</button>
+<input type="checkbox" id="dcb13" checked /><label>direct</label>
+</div>
+<div>
+<div id="vs13" class="slider"></div>
+<script type="text/javascript">nwsl('vs13','nv1013','v1013','dcb13',255,2,%1013%,'1013',0);</script>
+</div>
+</div>
+<div>
+<form id="f13">
+<input id="di13" type="radio" name="mode" onclick="wV('1113','DIN','v1113');rV('1013','v1013');"><label>Digital input</label>
+<input id="ou13" type="radio" name="mode" onclick="wV('1113','OUT','v1113');rV('1013','v1013');"><label>Output</label><br />
+<input id="ai13" type="radio" name="mode" onclick="wV('1113','AIN','v1113');rV('1013','v1013');"><label>Analog input</label>
+</form>
+</div>
+<script type="text/javascript">
+eID('di13').checked=false;
+eID('ai13').checked=false;
+eID('ou13').checked=false;
+if ('%1113%'=='AIN') eID('ai13').checked=true;
+else if ('%1113%'=='DIN') eID('di13').checked=true;
+else if ('%1113%'=='OUT') eID('ou13').checked=true;
+</script>
+</div>
+</div>
+</div>
+
+<div style="clear:both"></div>
+</div>
+</div><!--tabPINS-->
+
+<div class="tabDeact" id="tabRS485">
+<h3>Description</h3>
+<div class="tabHead">
+</div>
+
+<div class="tabBody">
+<div>
+<h4>Write string to RS485</h4>
+<form id="fRs485" onSubmit="wV('5555',vID('nv5555'),'v5555');eID('nv5555').value='';return false;">
+<input type="text" maxlength="60" id="nv5555" />
+<button type="submit">Send</button>
+</form>
+</div>
+<div id="outRs485">
+<h4>Last characters received on RS485</h4>
+<button type="button" onclick="rV('5555','v5555');">Refresh</button>
+<label>Refresh every</label>
+<select id="rtRs485" onChange="srf('5555','v5555',vID('rtRs485'));">
+<option value="0" id="rtRs485DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtRs485DF').selected=true;</script>
+<textarea id="v5555">%5555%</textarea>
+</div>
+
+<div id="railContainer">
+<h4>Access the RS485 using the DinRailBus protocol</h4>
+<p>Construct to RS485 input field or send directly</p>
+<script type="text/javascript">
+function cRBCmd(){
+	var r="RP";
+  for(i=vID('rbId').length;i<2;i++) r+="0";
+	r+=vID('rbId');
+	if (eID('rbWr').checked) r+="W";
+  else r+="R";
+  for(i=vID('rbReg').length;i<2;i++) r+="0";
+  r+=vID('rbReg');
+	if (eID('rbWr').checked)
+	{
+		for(i=vID('rbVal').length;i<8;i++) r+="0";
+		r+=vID('rbVal');
+	}
+	r+="00";
+	return r;
+}
+</script>
+<form id="crbc" onSubmit="wV('5555',cRBCmd(),'v5555');return false;">
+<p id="buts">
+<button type="button" onclick="eID('nv5555').value=cRBCmd();return false;">Construct</button><br />
+<button type="submit">Send</button>
+</p>
+<p>
+<label>ID (hex):</label><input type="text" maxlength="2" id="rbId" />
+<label>Register (hex):</label><input type="text" maxlength="2" id="rbReg" />
+</p>
+<p>
+<label>Write?:</label><input type="checkbox" id="rbWr" />
+<label>Value (hex):</label><input type="text" maxlength="8" id="rbVal" />
+</p>
+</form>
+</div>
+
+<div id="railAddress">
+<h4>Change DinRailBus Devices Address</h4>
+<p>Result: <span id="v5556"></span></p>
+<div>
+<form id="chRBA" onSubmit="wV('5556',padString(vID('oldRBA'),2,'0')+'FF000000'+padString(vID('newRBA'),2,'0'),'v5556');return false;">
+<label>Old ID (hex):</label><input type="text" maxlength="2" id="oldRBA" />
+<label>New ID (hex):</label><input type="text" maxlength="2" id="newRBA" />
+<button type="submit">Send</button>
+</form>
+</div>
+</div>
+
+<div style="clear:both;"></div>
+</div>
+</div><!--tabRS485-->
+
+<div class="tabDeact" id="tabDIMM">
+<h3>Utilizing a DIN-Rail LED-Dimmer using DIN-Rail BUS protocol on RS485</h3>
+<div class="tabHead">
+<form onSubmit="wV('6000',vID('nv6000'),'v6000',refreshMaxDimVal);return false;">
+Target modules address (hex): <span id="v6000">%6000%</span>
+<input id="nv6000" type="text" maxlength="2" class="pwm" />
+<button type="submit">Set</button>
+(Dim-Values from 0 to <span id="maxdimval"></span>)
+<script type="text/javascript">
+function refreshMaxDimVal(a){
+  rV('6010','maxdimval',initDimSliders);
+}
+</script>
+</form>
+</div>
+
+<div class="tabBody">
+<div id="tabDimmBody" class="hidden">
+<div class="dioP" id="dimall">
+<div>
+<div class="dioStat">
+<strong>Set all Channels</strong> <span style="visibility:hidden;" id="v6009"></span>
+</div>
+</div>
+<div style="clear:both">
+<div>
+<div>
+<form onSubmit="wV('6009',vID('nv6009'),'v6009',upAllDimCh);return false;">
+<input id="nv6009" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdimall" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdimall" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="clear:both"></div>
+<div class="left">
+
+<div class="dioP" id="dim1">
+<div>
+<div class="dioStat">
+<strong>Cannel 1:</strong> <span id="v6001"></span>
+<button type="button" onclick="rV('6001','v6001');">Refresh</button>
+<label>Auto</label>
+<select id="rtdim1" onChange="srf('6001','v6001',vID('rtdim1'));">
+<option value="0" id="rtdim1DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtdim1DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6001',vID('nv6001'),'v6001',function(a){drsl('vsdim1',a);});return false;">
+<input id="nv6001" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdim1" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdim1" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dioP" id="dim2">
+<div>
+<div class="dioStat">
+<strong>Cannel 2:</strong> <span id="v6002"></span>
+<button type="button" onclick="rV('6002','v6002');">Refresh</button>
+<label>Auto</label>
+<select id="rtdim2" onChange="srf('6002','v6002',vID('rtdim2'));">
+<option value="0" id="rtdim2DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtdim2DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6002',vID('nv6002'),'v6002',function(a){drsl('vsdim2',a);});return false;">
+<input id="nv6002" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdim2" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdim2" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dioP" id="dim3">
+<div>
+<div class="dioStat">
+<strong>Cannel 3:</strong> <span id="v6003"></span>
+<button type="button" onclick="rV('6003','v6003');">Refresh</button>
+<label>Auto</label>
+<select id="rtdim3" onChange="srf('6003','v6003',vID('rtdim3'));">
+<option value="0" id="rtdim3DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtdim3DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6003',vID('nv6003'),'v6003',function(a){drsl('vsdim3',a);});return false;">
+<input id="nv6003" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdim3" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdim3" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dioP" id="dim4">
+<div>
+<div class="dioStat">
+<strong>Cannel 4:</strong> <span id="v6004"></span>
+<button type="button" onclick="rV('6004','v6004');">Refresh</button>
+<label>Auto</label>
+<select id="rtdim4" onChange="srf('6004','v6004',vID('rtdim4'));">
+<option value="0" id="rtdim4DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtdim4DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6004',vID('nv6004'),'v6004',function(a){drsl('vsdim4',a);});return false;">
+<input id="nv6004" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdim4" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdim4" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="right">
+
+<div class="dioP" id="dim5">
+<div>
+<div class="dioStat">
+<strong>Cannel 5:</strong> <span id="v6005"></span>
+<button type="button" onclick="rV('6005','v6005');">Refresh</button>
+<label>Auto</label>
+<select id="rtdim5" onChange="srf('6005','v6005',vID('rtdim5'));">
+<option value="0" id="rtdim5DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtdim5DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6005',vID('nv6005'),'v6005',function(a){drsl('vsdim5',a);});return false;">
+<input id="nv6005" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdim5" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdim5" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dioP" id="dim6">
+<div>
+<div class="dioStat">
+<strong>Cannel 6:</strong> <span id="v6006"></span>
+<button type="button" onclick="rV('6006','v6006');">Refresh</button>
+<label>Auto</label>
+<select id="rtdim6" onChange="srf('6006','v6006',vID('rtdim6'));">
+<option value="0" id="rtdim6DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtdim6DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6006',vID('nv6006'),'v6006',function(a){drsl('vsdim6',a);});return false;">
+<input id="nv6006" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdim6" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdim6" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dioP" id="dim7">
+<div>
+<div class="dioStat">
+<strong>Cannel 7:</strong> <span id="v6007"></span>
+<button type="button" onclick="rV('6007','v6007');">Refresh</button>
+<label>Auto</label>
+<select id="rtdim7" onChange="srf('6007','v6007',vID('rtdim7'));">
+<option value="0" id="rtdim7DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtdim7DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6007',vID('nv6007'),'v6007',function(a){drsl('vsdim7',a);});return false;">
+<input id="nv6007" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdim7" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdim7" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dioP" id="dim8">
+<div>
+<div class="dioStat">
+<strong>Cannel 8:</strong> <span id="v6008"></span>
+<button type="button" onclick="rV('6008','v6008');">Refresh</button>
+<label>Auto</label>
+<select id="rtdim8" onChange="srf('6008','v6008',vID('rtdim8'));">
+<option value="0" id="rtdim8DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtdim8DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6008',vID('nv6008'),'v6008',function(a){drsl('vsdim8',a);});return false;">
+<input id="nv6008" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbdim8" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vsdim8" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div style="clear:both;"></div>
+</div>
+</div>
+</div><!-- tabDimm -->
+
+<div class="tabDeact" id="tabRELAIS">
+<h3>Utilizing a DIN-Rail Relais 6I6S using DIN-Rail BUS protocol on RS485</h3>
+<div class="tabHead">
+<form onSubmit="wV('6109',vID('nv6109'),'v6109',function(){rV('6100','v6100');rV('6101','v6101');});return false;">
+Target modules address (hex): <span id="v6109">%6109%</span>
+<input id="nv6109" type="text" maxlength="2" class="pwm" />
+<button type="submit">Set</button>
+</form>
+</div>
+
+<div class="tabBody">
+<div>
+<h4>Accessing Din Rail Relais Registers</h4>
+<div id="relaisreg0" class="dioP">
+<div>
+<div class="dioStat">
+<strong>Register0 (hex):</strong> <span id="v6100">%6100%</span>
+<button type="button" onclick="rV('6100','v6100');">Refresh</button>
+<label>Auto</label>
+<select id="rtrel0" onChange="srf('6100','v6100',vID('rtrel0'));">
+<option value="0" id="rtrel0DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtrel0DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6100',vID('nv6100'),'v6100');return false;">
+<label>New value (hex):</label>
+<input id="nv6100" type="text" maxlength="8" />
+<button type="submit">Set Value</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+
+<div id="relaisreg1" class="dioP">
+<div>
+<div class="dioStat">
+<strong>Register1 (hex):</strong> <span id="v6101">%6101%</span>
+<button type="button" onclick="rV('6101','v6101');">Refresh</button>
+<label>Auto</label>
+<select id="rtrel1" onChange="srf('6101','v6101',vID('rtrel1'));">
+<option value="0" id="rtrel1DF">OFF</option>
+<option value="500">500</option>
+<option value="2500">2500</option>
+<option value="5000">5000</option>
+</select><label>ms</label>
+<script type="text/javascript">eID('rtrel1DF').selected=true;</script>
+</div>
+</div>
+<div>
+<div>
+<div>
+<form onSubmit="wV('6101',vID('nv6101'),'v6101');return false;">
+<label>New value (hex):</label>
+<input id="nv6101" type="text" maxlength="8" />
+<button type="submit">Set Value</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="relaisCBs">
+<div>
+<label>Relais1:</label><span id="v6103">%6103%</span>
+<button type="button" onclick="wV('6103','1','v6103');">On</button>
+<button type="button" onclick="wV('6103','0','v6103');">Off</button>
+<button type="button" onclick="rV('6103','v6103');">Read</button>
+</div><div>
+<label>Relais2:</label><span id="v6104">%6104%</span>
+<button type="button" onclick="wV('6104','1','v6104');">On</button>
+<button type="button" onclick="wV('6104','0','v6104');">Off</button>
+<button type="button" onclick="rV('6104','v6104');">Read</button>
+</div><div>
+<label>Relais3:</label><span id="v6105">%6105%</span>
+<button type="button" onclick="wV('6105','1','v6105');">On</button>
+<button type="button" onclick="wV('6105','0','v6105');">Off</button>
+<button type="button" onclick="rV('6105','v6105');">Read</button>
+</div><div>
+<label>Relais4:</label><span id="v6106">%6106%</span>
+<button type="button" onclick="wV('6106','1','v6106');">On</button>
+<button type="button" onclick="wV('6106','0','v6106');">Off</button>
+<button type="button" onclick="rV('6106','v6106');">Read</button>
+</div><div>
+<label>Relais5:</label><span id="v6107">%6107%</span>
+<button type="button" onclick="wV('6107','1','v6107');">On</button>
+<button type="button" onclick="wV('6107','0','v6107');">Off</button>
+<button type="button" onclick="rV('6107','v6107');">Read</button>
+</div><div>
+<label>Relais6:</label><span id="v6108">%6108%</span>
+<button type="button" onclick="wV('6108','1','v6108');">On</button>
+<button type="button" onclick="wV('6108','0','v6108');">Off</button>
+<button type="button" onclick="rV('6108','v6108');">Read</button>
+</div>
+</div>
+
+<div style="clear:both"></div>
+</div>
+</div><!-- tabRELAIS -->
+
+<div class="tabDeact" id="tabADDA">
+<h3>Utilizing a DIN-Rail ADDA 6I4O using DIN-Rail BUS protocol on RS485</h3>
+<div class="tabHead">
+</div>
+
+<div class="tabBody">
+
+<div style="clear:both"></div>
+</div>
+
+<div style="clear:both"></div>
+</div><!-- tabADDA -->
+
+<div class="tabDeact" id="tabPWM">
+<h3>Utilizing a DIN-Rail PWM-Driver using DIN-Rail BUS protocol on RS485</h3>
+<div class="tabHead">
+<form onSubmit="wV('6250',vID('nv6250'),'v6250',refreshMaxPwmVal);return false;">
+Target modules address (hex): <span id="v6250">%6250%</span>
+<input id="nv6250" type="text" maxlength="2" class="pwm" />
+<button type="submit">Set</button>
+(Pwm-Values from <span id="minpwmval"></span> to <span id="maxpwmval"></span>)
+<script type="text/javascript">
+function refreshMaxPwmVal(a){
+  rV('6255','minpwmval',function(){
+  	rV('6251','maxpwmval',initPwmSliders);
+	});
+}
+</script>
+</form>
+</div><!--tabPWM head-->
+
+<div class="tabBody">
+<div id="tabPwmBody" class="hidden">
+<h4>Accessing PWM-Driver</h4>
+
+<div class="right" id="pwmGE">
+<label>Global Enable:</label><span id="v6253"></span>
+<button type="button" onclick="wV('6253','1','v6253');">On</button>
+<button type="button" onclick="wV('6253','0','v6253');">Off</button>
+<button type="button" onclick="rV('6253','v6253');">Read</button>
+</div>
+
+<div class="dioP" id="pwmall">
+<div>
+<div class="dioStat">
+<strong>Set all Channels</strong> <span style="visibility:hidden;" id="v6252"></span>
+</div>
+</div>
+<div style="clear:both">
+<div>
+<div>
+<form onSubmit="wV('6252',vID('nv6252'),'v6252',upAllPwmCh);return false;">
+<input id="nv6252" type="text" maxlength="3" class="pwm" />
+<button type="submit">Set Value</button>
+<input type="checkbox" id="dcbpwmall" checked /><label>direct</label>
+</form>
+</div>
+<div>
+<div id="vspwmall" class="slider"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="pwmSingles"><!--single channels-->
+<h4>Accessing seperate channels</h4>
+
+<div><!--Group 1-->
+<div class="left">
+
+<div class="dioP" id="dioP6201">
+<div><div class="dioStat">
+<strong>Cannel 1:</strong> <span id="v6201"></span>
+<button type="button" onclick="rV('6201','v6201');">Refresh</button>
+<label>Auto</label><select id="rt6201" onChange="srf('6201','v6201',vID('rt6201'));">
+<option value="0" id="rt6201DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6201DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6201',vID('nv6201'),'v6201',function(a){drsl('vs6201',a);});return false;">
+<input id="nv6201" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6201" checked /><label>direct</label></form>
+</div><div><div id="vs6201" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6221"></span>
+<button type="button" onclick="wV('6221','1','v6221');">On</button>
+<button type="button" onclick="wV('6221','0','v6221');">Off</button>
+<button type="button" onclick="rV('6221','v6221');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6202">
+<div><div class="dioStat">
+<strong>Cannel 2:</strong> <span id="v6202"></span>
+<button type="button" onclick="rV('6202','v6202');">Refresh</button>
+<label>Auto</label><select id="rt6202" onChange="srf('6202','v6202',vID('rt6202'));">
+<option value="0" id="rt6202DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6202DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6202',vID('nv6202'),'v6202',function(a){drsl('vs6202',a);});return false;">
+<input id="nv6202" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6202" checked /><label>direct</label></form>
+</div><div><div id="vs6202" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6222"></span>
+<button type="button" onclick="wV('6222','1','v6222');">On</button>
+<button type="button" onclick="wV('6222','0','v6222');">Off</button>
+<button type="button" onclick="rV('6222','v6222');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6203">
+<div><div class="dioStat">
+<strong>Cannel 3:</strong> <span id="v6203"></span>
+<button type="button" onclick="rV('6203','v6203');">Refresh</button>
+<label>Auto</label><select id="rt6203" onChange="srf('6203','v6203',vID('rt6203'));">
+<option value="0" id="rt6203DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6203DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6203',vID('nv6203'),'v6203',function(a){drsl('vs6203',a);});return false;">
+<input id="nv6203" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6203" checked /><label>direct</label></form>
+</div><div><div id="vs6203" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6223"></span>
+<button type="button" onclick="wV('6223','1','v6223');">On</button>
+<button type="button" onclick="wV('6223','0','v6223');">Off</button>
+<button type="button" onclick="rV('6223','v6223');">Read</button>
+</div></div></div>
+
+</div><!--left-->
+<div class="right">
+
+<div class="dioP" id="dioP6204">
+<div><div class="dioStat">
+<strong>Cannel 4:</strong> <span id="v6204"></span>
+<button type="button" onclick="rV('6204','v6204');">Refresh</button>
+<label>Auto</label><select id="rt6204" onChange="srf('6204','v6204',vID('rt6204'));">
+<option value="0" id="rt6204DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6204DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6204',vID('nv6204'),'v6204',function(a){drsl('vs6204',a);});return false;">
+<input id="nv6204" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6204" checked /><label>direct</label></form>
+</div><div><div id="vs6204" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6224"></span>
+<button type="button" onclick="wV('6224','1','v6224');">On</button>
+<button type="button" onclick="wV('6224','0','v6224');">Off</button>
+<button type="button" onclick="rV('6224','v6224');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6205">
+<div><div class="dioStat">
+<strong>Cannel 5:</strong> <span id="v6205"></span>
+<button type="button" onclick="rV('6205','v6205');">Refresh</button>
+<label>Auto</label><select id="rt6205" onChange="srf('6205','v6205',vID('rt6205'));">
+<option value="0" id="rt6205DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6205DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6205',vID('nv6205'),'v6205',function(a){drsl('vs6205',a);});return false;">
+<input id="nv6205" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6205" checked /><label>direct</label></form>
+</div><div><div id="vs6205" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6225"></span>
+<button type="button" onclick="wV('6225','1','v6225');">On</button>
+<button type="button" onclick="wV('6225','0','v6225');">Off</button>
+<button type="button" onclick="rV('6225','v6225');">Read</button>
+</div></div></div>
+
+</div><!--right-->
+<div style="clear:both"></div>
+</div><!--Group 1-->
+
+<div><!--Group 2-->
+<div class="left">
+
+<div class="dioP" id="dioP6206">
+<div><div class="dioStat">
+<strong>Cannel 6:</strong> <span id="v6206"></span>
+<button type="button" onclick="rV('6206','v6206');">Refresh</button>
+<label>Auto</label><select id="rt6206" onChange="srf('6206','v6206',vID('rt6206'));">
+<option value="0" id="rt6206DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6206DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6206',vID('nv6206'),'v6206',function(a){drsl('vs6206',a);});return false;">
+<input id="nv6206" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6206" checked /><label>direct</label></form>
+</div><div><div id="vs6206" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6226"></span>
+<button type="button" onclick="wV('6226','1','v6226');">On</button>
+<button type="button" onclick="wV('6226','0','v6226');">Off</button>
+<button type="button" onclick="rV('6226','v6226');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6207">
+<div><div class="dioStat">
+<strong>Cannel 7:</strong> <span id="v6207"></span>
+<button type="button" onclick="rV('6207','v6207');">Refresh</button>
+<label>Auto</label><select id="rt6207" onChange="srf('6207','v6207',vID('rt6207'));">
+<option value="0" id="rt6207DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6207DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6207',vID('nv6207'),'v6207',function(a){drsl('vs6207',a);});return false;">
+<input id="nv6207" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6207" checked /><label>direct</label></form>
+</div><div><div id="vs6207" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6227"></span>
+<button type="button" onclick="wV('6227','1','v6227');">On</button>
+<button type="button" onclick="wV('6227','0','v6227');">Off</button>
+<button type="button" onclick="rV('6227','v6227');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6208">
+<div><div class="dioStat">
+<strong>Cannel 8:</strong> <span id="v6208"></span>
+<button type="button" onclick="rV('6208','v6208');">Refresh</button>
+<label>Auto</label><select id="rt6208" onChange="srf('6208','v6208',vID('rt6208'));">
+<option value="0" id="rt6208DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6208DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6208',vID('nv6208'),'v6208',function(a){drsl('vs6208',a);});return false;">
+<input id="nv6208" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6208" checked /><label>direct</label></form>
+</div><div><div id="vs6208" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6228"></span>
+<button type="button" onclick="wV('6228','1','v6228');">On</button>
+<button type="button" onclick="wV('6228','0','v6228');">Off</button>
+<button type="button" onclick="rV('6228','v6228');">Read</button>
+</div></div></div>
+
+</div><!--left-->
+<div class="right">
+
+<div class="dioP" id="dioP6209">
+<div><div class="dioStat">
+<strong>Cannel 9:</strong> <span id="v6209"></span>
+<button type="button" onclick="rV('6209','v6209');">Refresh</button>
+<label>Auto</label><select id="rt6209" onChange="srf('6209','v6209',vID('rt6209'));">
+<option value="0" id="rt6209DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6209DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6209',vID('nv6209'),'v6209',function(a){drsl('vs6209',a);});return false;">
+<input id="nv6209" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6209" checked /><label>direct</label></form>
+</div><div><div id="vs6209" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6229"></span>
+<button type="button" onclick="wV('6229','1','v6229');">On</button>
+<button type="button" onclick="wV('6229','0','v6229');">Off</button>
+<button type="button" onclick="rV('6229','v6229');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6210">
+<div><div class="dioStat">
+<strong>Cannel 10:</strong> <span id="v6210"></span>
+<button type="button" onclick="rV('6210','v6210');">Refresh</button>
+<label>Auto</label><select id="rt6210" onChange="srf('6210','v6210',vID('rt6210'));">
+<option value="0" id="rt6210DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6210DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6210',vID('nv6210'),'v6210',function(a){drsl('vs6210',a);});return false;">
+<input id="nv6210" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6210" checked /><label>direct</label></form>
+</div><div><div id="vs6210" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6230"></span>
+<button type="button" onclick="wV('6230','1','v6230');">On</button>
+<button type="button" onclick="wV('6230','0','v6230');">Off</button>
+<button type="button" onclick="rV('6230','v6230');">Read</button>
+</div></div></div>
+
+</div><!--right-->
+<div style="clear:both"></div>
+</div><!--Group 2-->
+
+<div><!--Group 3-->
+<div class="left">
+
+<div class="dioP" id="dioP6211">
+<div><div class="dioStat">
+<strong>Cannel 11:</strong> <span id="v6211"></span>
+<button type="button" onclick="rV('6211','v6211');">Refresh</button>
+<label>Auto</label><select id="rt6211" onChange="srf('6211','v6211',vID('rt6211'));">
+<option value="0" id="rt6211DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6211DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6211',vID('nv6211'),'v6211',function(a){drsl('vs6211',a);});return false;">
+<input id="nv6211" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6211" checked /><label>direct</label></form>
+</div><div><div id="vs6211" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6231"></span>
+<button type="button" onclick="wV('6231','1','v6231');">On</button>
+<button type="button" onclick="wV('6231','0','v6231');">Off</button>
+<button type="button" onclick="rV('6231','v6231');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6212">
+<div><div class="dioStat">
+<strong>Cannel 12:</strong> <span id="v6212"></span>
+<button type="button" onclick="rV('6212','v6212');">Refresh</button>
+<label>Auto</label><select id="rt6212" onChange="srf('6212','v6212',vID('rt6212'));">
+<option value="0" id="rt6212DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6212DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6212',vID('nv6212'),'v6212',function(a){drsl('vs6212',a);});return false;">
+<input id="nv6212" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6212" checked /><label>direct</label></form>
+</div><div><div id="vs6212" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6232"></span>
+<button type="button" onclick="wV('6232','1','v6232');">On</button>
+<button type="button" onclick="wV('6232','0','v6232');">Off</button>
+<button type="button" onclick="rV('6232','v6232');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6213">
+<div><div class="dioStat">
+<strong>Cannel 13:</strong> <span id="v6213"></span>
+<button type="button" onclick="rV('6213','v6213');">Refresh</button>
+<label>Auto</label><select id="rt6213" onChange="srf('6213','v6213',vID('rt6213'));">
+<option value="0" id="rt6213DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6213DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6213',vID('nv6213'),'v6213',function(a){drsl('vs6213',a);});return false;">
+<input id="nv6213" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6213" checked /><label>direct</label></form>
+</div><div><div id="vs6213" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6233"></span>
+<button type="button" onclick="wV('6233','1','v6233');">On</button>
+<button type="button" onclick="wV('6233','0','v6233');">Off</button>
+<button type="button" onclick="rV('6233','v6233');">Read</button>
+</div></div></div>
+
+</div><!--left-->
+<div class="right">
+
+<div class="dioP" id="dioP6214">
+<div><div class="dioStat">
+<strong>Cannel 14:</strong> <span id="v6214"></span>
+<button type="button" onclick="rV('6214','v6214');">Refresh</button>
+<label>Auto</label><select id="rt6214" onChange="srf('6214','v6214',vID('rt6214'));">
+<option value="0" id="rt6214DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6214DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6214',vID('nv6214'),'v6214',function(a){drsl('vs6214',a);});return false;">
+<input id="nv6214" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6214" checked /><label>direct</label></form>
+</div><div><div id="vs6214" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6234"></span>
+<button type="button" onclick="wV('6234','1','v6234');">On</button>
+<button type="button" onclick="wV('6234','0','v6234');">Off</button>
+<button type="button" onclick="rV('6234','v6234');">Read</button>
+</div></div></div>
+
+<div class="dioP" id="dioP6215">
+<div><div class="dioStat">
+<strong>Cannel 15:</strong> <span id="v6215"></span>
+<button type="button" onclick="rV('6215','v6215');">Refresh</button>
+<label>Auto</label><select id="rt6215" onChange="srf('6215','v6215',vID('rt6215'));">
+<option value="0" id="rt6215DF">OFF</option><option value="500">500</option>
+<option value="2500">2500</option><option value="5000">5000</option></select>
+<label>ms</label><script type="text/javascript">eID('rt6215DF').selected=true;</script>
+</div></div><div><div><div>
+<form onSubmit="wV('6215',vID('nv6215'),'v6215',function(a){drsl('vs6215',a);});return false;">
+<input id="nv6215" type="text" maxlength="3" class="pwm" /><button type="submit">Set Value</button>
+<input type="checkbox" id="dcb6215" checked /><label>direct</label></form>
+</div><div><div id="vs6215" class="slider"></div></div></div><div>
+<label>Enable: </label><span id="v6235"></span>
+<button type="button" onclick="wV('6235','1','v6235');">On</button>
+<button type="button" onclick="wV('6235','0','v6235');">Off</button>
+<button type="button" onclick="rV('6235','v6235');">Read</button>
+</div></div></div>
+
+</div><!--right-->
+<div style="clear:both"></div>
+</div><!--Group 3-->
+
+</div><!--single channels-->
+
+<div style="clear:both"></div>
+</div><!--tabPWMBody-->
+</div><!--tabPWM body-->
+
+<div style="clear:both"></div>
+</div><!--tabPWM-->
+
+<div style="clear:both;"></div>
+</div><!-- tabHolder -->
+</body>
+</html>

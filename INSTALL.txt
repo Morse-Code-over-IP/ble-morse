@@ -1,0 +1,25 @@
+Hardware Requirements:
+* radino nRF8001
+* radino Leonoardo (4)
+
+Software Requirements:
+* Arduino IDE (1.6.0 or later)
+
+Installing Radino Libs and HW
+
+Follow the instructions given in (3). On OSX the folder for the
+Arduino files is ~/Documents/Arduino
+
+Follow the instructions given in (2) to 
+assert: it is possible to detect the programmer and upload a sketch.
+
+Custom HW boards will be added using an interface (1)
+
+USB modem interface here: /dev/tty.usbmodem1411
+
+(1) 3rd party hw ide: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
+(2) doc/305000074A_radino_nRF8001.pdf
+(3) lib/README.txt
+(4) Radino Leonardo: http://shop.in-circuit.de/product_info.php?cPath=22_28&products_id=35
+(5) Wiki: http://wiki.in-circuit.de/index.php5?title=radino_Modules
+(6) Radino Support Files: http://wiki.in-circuit.de/index.php5?title=radino_Leonardo#Downloads
