@@ -6,7 +6,6 @@ COMPORT Drivers:
 http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_2_18.dmg
 
 Software Requirements:
-* Arduino IDE (1.6.0 or later)
 * Arduino IDE (1.0.5): http://arduino.googlecode.com/files/arduino-1.0.5-macosx.zip
 
 Installing Radino Libs and HW
@@ -19,7 +18,6 @@ Custom HW boards will be added using an interface (1)
 
 USB modem interface here: /dev/tty.usbmodem1411
 
-(1) 3rd party hw ide: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 (2) doc/305000074A_radino_nRF8001.pdf
 (4) Radino Leonardo: http://shop.in-circuit.de/product_info.php?cPath=22_28&products_id=35
 (5) Wiki: http://wiki.in-circuit.de/index.php5?title=radino_Modules
