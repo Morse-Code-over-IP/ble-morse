@@ -806,12 +806,6 @@ alternative to this: more information on arduino: https://github.com/michaelkrol
 
 
 
-// TODO: Serial cable: - no app store possible, 70$
-// http://redpark.com/lightning-serial-cable-l2-db9v/
-
-
-
-
 
 #ifdef EXT_KEY
 /*
@@ -828,8 +822,6 @@ alternative to this: more information on arduino: https://github.com/michaelkrol
  https://web.eecs.umich.edu/~prabal/pubs/papers/kuo10hijack.pdf
  https://code.google.com/p/hijack-main/
  
- 
- ton auf kanal -> empfange lautstärke -> an / aus
  */
 #endif
 
