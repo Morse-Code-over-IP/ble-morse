@@ -7,6 +7,10 @@ This is a prototype under development...
 
 Version v0.2 of the current and the repo above will work together.
 
+![Alt text](http://full/path/to/img.jpg "Optional title")
+![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+![Hello World](/img/hello_morse.jpg?raw=true "Hello world")
+
 
 Follow the instructions roughly given in install.txt.
 The arduino code is located in src.
