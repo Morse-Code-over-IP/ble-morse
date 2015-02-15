@@ -5,6 +5,9 @@ Bluetooth Low Energy interface for morse key. Can be used with
 [iOS IRMC](https://github.com/8cH9azbsFifZ/irmc-ios).
 This is a prototype under development...
 
+Version v0.2 of the current and the repo above will work together.
+
+
 Follow the instructions roughly given in install.txt.
 The arduino code is located in src.
 
