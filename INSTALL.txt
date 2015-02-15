@@ -1,10 +1,11 @@
+
+
 Hardware Requirements:
 * radino nRF8001
 * radino Leonoardo (4)
 
 WIRING:
-http://arduino.cc/en/Tutorial/Button
-
+http://arduino.cc/en/Tutorial/Button (pins 12 and 13)
 
 COMPORT Drivers:
 http://www.ftdichip.com/Drivers/VCP/MacOSX/FTDIUSBSerialDriver_v2_2_18.dmg
