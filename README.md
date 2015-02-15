@@ -8,8 +8,9 @@ This is a prototype under development...
 This is an implementation of a [MOIP](https://github.com/8cH9azbsFifZ/moip)
 client.
 
-
-Version v0.2 of the current and the repo above will work together.
+Compatibility:
+ble_morse 0.2 and ios-irmc 0.2 (ext branch)
+ble_morse 0.4 and ios-irmc 0.4
 
 ![Hello World](/img/hello_morse.jpg?raw=true "Hello world")
 
