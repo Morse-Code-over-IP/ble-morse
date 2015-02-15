@@ -5,6 +5,10 @@ Bluetooth Low Energy interface for morse key. Can be used with
 [iOS IRMC](https://github.com/8cH9azbsFifZ/irmc-ios).
 This is a prototype under development...
 
+This is an implementation of a [MOIP](https://github.com/8cH9azbsFifZ/moip)
+client.
+
+
 Version v0.2 of the current and the repo above will work together.
 
 ![Hello World](/img/hello_morse.jpg?raw=true "Hello world")
