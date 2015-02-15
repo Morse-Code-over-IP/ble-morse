@@ -1,8 +1,12 @@
 ble-morse
 =========
 
-iOS Version of [IRMC](https://github.com/8cH9azbsFifZ/irmc).
+Bluetooth Low Energy interface for morse key. Can be used with 
+[iOS IRMC](https://github.com/8cH9azbsFifZ/irmc-ios).
 This is a prototype under development...
+
+Follow the instructions roughly given in install.txt.
+The arduino code is located in src.
 
 Why include binary files?
 =========================
