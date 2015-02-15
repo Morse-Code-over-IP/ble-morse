@@ -522,7 +522,7 @@ void loop() {
   if (buttonstate == LOW) {         // check if the input is HIGH (button released)
     if (oldstate != buttonstate)
     {
-      char oo[]="oo";
+      char oo[]="k";
       uart_tx((uint8_t *)&oo[0], strlen(oo));
       #ifdef SERIAL
        //   Serial.print(F("ending: "));
@@ -533,8 +533,11 @@ void loop() {
 
   } else {
     digitalWrite(ledPin, HIGH);  // turn LED ON
-    char hello[]="m";
+        if (oldstate != buttonstate)
+    {
+    char hello[]="v";
     uart_tx((uint8_t *)&hello[0], strlen(hello));
+    }
   }
 
   
