@@ -109,7 +109,7 @@ int ledPin = 13; // choose the pin for the LED
 int inPin = 12;   // choose the input pin (for a pushbutton)
 void setup(void)
 {
-  #ifdef SERIAL
+  #ifdef SERIAL1
   Serial.begin(115200);
   //Wait until the serial port is available (useful only for the Leonardo)
   //As the Leonardo board is not reseted every time you open the Serial Monitor
@@ -525,7 +525,7 @@ void loop() {
       char oo[]="k";
       uart_tx((uint8_t *)&oo[0], strlen(oo));
       #ifdef SERIAL
-       //   Serial.print(F("ending: "));
+        //  Serial.print(F("k"));
       #endif
 
     }
@@ -537,6 +537,10 @@ void loop() {
     {
     char hello[]="v";
     uart_tx((uint8_t *)&hello[0], strlen(hello));
+       #ifdef SERIAL
+         // Serial.print(F("v"));
+      #endif
+
     }
   }
 
