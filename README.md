@@ -12,13 +12,6 @@ Can be used with [iOS IRMC](https://github.com/morse-code-over-ip/irmc-ios).
 + ble_morse 0.2 and ios-irmc 0.2 (ext branch)
 + ble_morse 0.4 and ios-irmc 0.4
 
-The arduino code is located in src.
-
-## Why include binary files?
-Because files vanish (i.e. N810 produced 2008, firmwares all gone from the web in 2014).
-
-Based on the following codes:
-https://github.com/adafruit/Bluefruit_LE_Connect
 
 ## Code Quality
 This is experimental code.
@@ -50,5 +43,5 @@ Remarks on the installation process:
 + (4) Radino Leonardo: http://shop.in-circuit.de/product_info.php?cPath=22_28&products_id=35
 + (5) Wiki: http://wiki.in-circuit.de/index.php5?title=radino_Modules
 + (6) Radino Support Files: http://wiki.in-circuit.de/index.php5?title=radino_Leonardo#Downloads
-
++ Based on the following codes: https://github.com/adafruit/Bluefruit_LE_Connect
 
