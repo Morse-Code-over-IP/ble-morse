@@ -1,9 +1,9 @@
 # ble-morse
 Bluetooth Low Energy interface for morse key. Can be used with 
-[iOS IRMC](https://github.com/8cH9azbsFifZ/irmc-ios).
+[iOS IRMC](https://github.com/morse-code-over-ip/irmc-ios).
 This is a prototype under development...
 
-This is an implementation of a [MOIP](https://github.com/8cH9azbsFifZ/moip)
+This is an implementation of a [MOIP](https://github.com/morse-code-over-ip/moip)
 client.
 
 ## Compatibility:
